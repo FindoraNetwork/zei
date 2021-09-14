@@ -307,12 +307,7 @@ pub(super) fn Quotient_polynomial<
 
     println!(" Quotient_polynomial 4 {:#?}", SystemTime::now());
     let k_inv = k[1].inv().c(d!(PlonkError::DivisionByZero))?;
-    println!(
-        " Quotient_polynomial result {:#?} {:#?} {:#?}",
-        root_m,
-        &quot_coset_evals.len(),
-        &k_inv
-    );
+     println!(" Quotient_polynomial result {:#?} {:#?} {:#?}", root_m, &quot_coset_evals.len(), &k_inv);
     Ok(FpPolynomial::coset_ffti(root_m, &quot_coset_evals, &k_inv))
 }
 
