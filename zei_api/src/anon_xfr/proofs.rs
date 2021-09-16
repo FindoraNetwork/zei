@@ -256,14 +256,12 @@ mod tests {
         let secret_inputs =
             new_multi_xfr_witness_for_test(inputs.to_vec(), outputs.to_vec(), [0u8; 32]);
         let pub_inputs = AMultiXfrPubInputs::from_witness(&secret_inputs);
-        let params = UserParams::from_file_if_exists(
+        let params = UserParams::new(
             n_payers,
             n_payees,
             Some(1),
             DEFAULT_BP_NUM_GENS,
-            None,
-        )
-        .unwrap();
+        );
         let mut prng = ChaChaRng::from_seed([0u8; 32]);
         let proof = prove_xfr(&mut prng, &params, secret_inputs).unwrap();
 

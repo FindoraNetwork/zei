@@ -262,29 +262,46 @@ pub(super) fn Quotient_polynomial<
 
     println!(" Quotient_polynomial 3 {:#?}", SystemTime::now());
     for point in 0..m {
-        let _now = SystemTime::now();
+        let now = SystemTime::now();
         let wire_vals: Vec<&PCS::Field> = witness_polys_coset_evals
             .iter()
             .map(|poly_coset_evals| &poly_coset_evals[point])
             .collect();
+        if point == 0 {
+            println!("1 {:?}", SystemTime::now().duration_since(now));
+        }
         let sel_vals: Vec<&PCS::Field> = params
             .selectors_coset_evals
             .iter()
             .map(|poly_coset_evals| &poly_coset_evals[point])
             .collect();
+        if point == 0 {
+            println!("2 {:?}", SystemTime::now().duration_since(now));
+        }
         let term1 = cs.eval_gate_func(&wire_vals, &sel_vals, &IO_coset_evals[point])?;
-
+        if point == 0 {
+            println!("3 {:?}", SystemTime::now().duration_since(now));
+        }
         // alpha * [\Sigma(X)\prod_j (fj(X) + gamma * kj * X + delta)]
         let mut term2 = alpha.mul(&Sigma_coset_evals[point]);
+        if point == 0 {
+            println!("4 {:?}", SystemTime::now().duration_since(now));
+        }
         for j in 0..cs.n_wires_per_gate() {
             let tmp = witness_polys_coset_evals[j][point]
                 .add(&delta)
                 .add(&gamma.mul(&k[j].mul(&params.coset_quot[point])));
             term2.mul_assign(&tmp);
         }
+        if point == 0 {
+            println!("5 {:?}", SystemTime::now().duration_since(now));
+        }
 
         // alpha * [\Sigma(g*X)\prod_j (fj(X) + gamma * perm_j(X) + delta)]
         let mut term3 = alpha.mul(&Sigma_coset_evals[(point + factor) % m]);
+        if point == 0 {
+            println!("6 {:?}", SystemTime::now().duration_since(now));
+        }
         for (w_poly_coset_evals, perm_coset_evals) in witness_polys_coset_evals
             .iter()
             .zip(params.perms_coset_evals.iter())
@@ -294,14 +311,25 @@ pub(super) fn Quotient_polynomial<
                 .add(&gamma.mul(&perm_coset_evals[point]));
             term3.mul_assign(&tmp);
         }
+        if point == 0 {
+            println!("7 {:?}", SystemTime::now().duration_since(now));
+        }
 
         // alpha^2 * (Sigma(X) - 1) * L_1(X)
         let term4 = alpha_sq
             .mul(&params.L1_coset_evals[point])
             .mul(&Sigma_coset_evals[point].sub(&PCS::Field::one()));
-
+        if point == 0 {
+            println!("8 {:?}", SystemTime::now().duration_since(now));
+        }
         let numerator = term1.add(&term2).add(&term4.sub(&term3));
+        if point == 0 {
+            println!("9 {:?}", SystemTime::now().duration_since(now));
+        }
         quot_coset_evals.push(numerator.mul(&params.Z_H_inv_coset_evals[point]));
+        if point == 0 {
+            println!("10 {:?}", SystemTime::now().duration_since(now));
+        }
         // println!("{:#?}", SystemTime::now().duration_since(now));
     }
 
