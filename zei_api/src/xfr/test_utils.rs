@@ -165,6 +165,7 @@ pub fn multiple_key_gen(n: usize) -> (Vec<XfrKeyPair>, XfrPublicKey) {
     (sender_key_pairs, recv_pub_key)
 }
 
+// The following function prepares the inputs and outputs for transactions with asset tracing policies
 pub fn prepare_inputs_and_outputs_with_policies(
     sender_key_pairs: &[&XfrKeyPair],
     user_ac_sks: Vec<ACUserSecretKey>,
@@ -245,6 +246,7 @@ pub fn prepare_inputs_and_outputs_with_policies(
     (ar_ins, output_asset_records)
 }
 
+// The following function prepares the inputs and outputs for transactions with a single asset without any asset tracing policy
 pub fn prepare_inputs_and_outputs_without_policies_single_asset(
     sender_key_pairs: &[&XfrKeyPair],
     n: usize,
@@ -294,6 +296,7 @@ pub fn prepare_inputs_and_outputs_without_policies_single_asset(
     (ar_ins, output_asset_records)
 }
 
+// The following function prepares the inputs and outputs for transactions with a single asset with asset tracing policies
 pub fn prepare_inputs_and_outputs_with_policies_single_asset(
     sender_key_pairs: &[&XfrKeyPair],
     user_ac_sks: Vec<ACUserSecretKey>,
@@ -313,6 +316,7 @@ pub fn prepare_inputs_and_outputs_with_policies_single_asset(
     )
 }
 
+// The following function prepares the inputs and outputs for transactions with multiple assets with asset tracing policies
 pub fn prepare_inputs_and_outputs_with_policies_multiple_assets(
     sender_key_pairs: &[&XfrKeyPair],
     user_ac_sks: Vec<ACUserSecretKey>,
@@ -332,6 +336,7 @@ pub fn prepare_inputs_and_outputs_with_policies_multiple_assets(
     )
 }
 
+// The following function generates asset tracing policies with identity tracing
 pub fn gen_policies_with_id_tracing(
     ac_commitments: &[ACCommitment],
     asset_tracing_policy_input: TracingPolicy,
@@ -352,6 +357,7 @@ pub fn gen_policies_with_id_tracing(
     )
 }
 
+// The following function generates asset tracing policies without any identity tracing
 pub fn gen_policies_no_id_tracing(n: usize) -> XfrNotePolicies {
     let inputs_sig_commitments = vec![None; n];
     let outputs_tracing_policies = vec![TracingPolicies::new(); n];
