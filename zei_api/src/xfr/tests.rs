@@ -32,6 +32,7 @@ use utils::errors::ZeiError::{
 };
 use utils::u64_to_u32_pair;
 
+// The following function creates a transfer note
 pub(crate) fn create_xfr(
     prng: &mut ChaChaRng,
     input_templates: &[AssetRecordTemplate],
@@ -57,6 +58,7 @@ pub(crate) fn create_xfr(
     (xfr_note, inputs, outputs)
 }
 
+// The following function generates a vector of key pairs
 pub(crate) fn gen_key_pair_vec(size: usize, prng: &mut ChaChaRng) -> Vec<XfrKeyPair> {
     let mut keys = vec![];
     for _i in 0..size {
@@ -65,6 +67,7 @@ pub(crate) fn gen_key_pair_vec(size: usize, prng: &mut ChaChaRng) -> Vec<XfrKeyP
     keys
 }
 
+// The following function tests transfers with a single asset
 fn do_transfer_tests_single_asset(
     params: &mut PublicParams,
     inputs_template: &[AssetRecordType],
@@ -320,6 +323,7 @@ fn do_transfer_tests_single_asset(
     );
 }
 
+// The following module tests transfers with a single asset for transactions without any asset tracing policy 
 mod single_asset_no_tracing {
 
     use super::*;
@@ -502,6 +506,7 @@ mod single_asset_no_tracing {
     }
 }
 
+// The following module tests transfers with multiple assets for transactions without any asset tracing policy
 mod multi_asset_no_tracing {
 
     use super::*;
@@ -653,6 +658,7 @@ mod multi_asset_no_tracing {
     }
 }
 
+// The following module checks whether keys are correct for transfers
 mod keys {
 
     use super::*;
@@ -730,6 +736,7 @@ mod keys {
     }
 }
 
+// The following module checks all tests with identity tracing
 mod identity_tracing {
 
     //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -869,6 +876,7 @@ mod identity_tracing {
     }
 }
 
+// The following module checks all tests with asset tracing
 mod asset_tracing {
 
     //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -890,7 +898,7 @@ mod asset_tracing {
 
     const GOLD_ASSET: AssetType = AssetType([0; ASSET_TYPE_LENGTH]);
     const BITCOIN_ASSET: AssetType = AssetType([1; ASSET_TYPE_LENGTH]);
-
+    
     fn create_wrong_proof() -> PedersenElGamalEqProof {
         let m = Scalar::from_u32(10);
         let r = Scalar::from_u32(7657);
@@ -1194,7 +1202,8 @@ mod asset_tracing {
             &policies
         ));
     }
-
+    
+    // The following function tests transactions with single input and single output without any asset tracing policy, with confidential amounts and asset types
     #[test]
     fn test_one_input_one_output_all_confidential() {
         let mut prng: ChaChaRng;
@@ -1243,7 +1252,9 @@ mod asset_tracing {
             output_templates.as_slice(),
         );
     }
-
+    
+    // The following function tests transactions with single input and single output with an input asset tracing policy but no output asset tracing policy
+    // with confidential amount
     #[test]
     fn test_one_input_one_output_amount_confidential() {
         let mut prng: ChaChaRng;
@@ -1274,7 +1285,9 @@ mod asset_tracing {
 
         do_test_asset_tracing(&mut params, &input_templates, &output_templates);
     }
-
+    
+    // The following function tests transactions with single input and single output with an input asset tracing policy but no output asset tracing policy
+    // with confidential asset types
     #[test]
     fn test_one_input_one_output_asset_confidential() {
         let mut prng = ChaChaRng::from_seed([0u8; 32]);
@@ -1309,7 +1322,9 @@ mod asset_tracing {
             output_templates.as_slice(),
         );
     }
-
+    
+    // The following function tests transactions with two inputs and two outputs with input asset tracing policy but no output asset tracing policy
+    // with confidential amounts as well as asset types
     #[test]
     fn test_two_inputs_two_outputs_all_confidential_tracing_on_inputs() {
         let mut prng: ChaChaRng;
@@ -1356,6 +1371,8 @@ mod asset_tracing {
         do_test_asset_tracing(&mut params, &input_templates, &output_templates);
     }
 
+    // The following function tests transactions with two inputs and two outputs with both input asset tracing policy and output asset tracing policy
+    // with confidential amounts as well as asset types
     #[test]
     fn test_two_inputs_two_outputs_all_confidential_tracing_on_inputs_and_outputs() {
         let mut prng: ChaChaRng;
@@ -1402,6 +1419,7 @@ mod asset_tracing {
         do_test_asset_tracing(&mut params, &input_templates, &output_templates);
     }
 
+    // The following function tests transactions with a single asset with asset tracing policy for the first input 
     #[test]
     fn test_single_asset_first_input_asset_tracing() {
         let mut prng: ChaChaRng;
@@ -1460,6 +1478,7 @@ mod asset_tracing {
         do_test_asset_tracing(&mut params, &input_templates, &output_templates);
     }
 
+    // The following function tests transactions with a single asset with asset tracing policy for the first two inputs
     #[test]
     fn test_single_asset_two_first_input_asset_tracing() {
         // The first two inputs have asset tracing policies
@@ -1517,7 +1536,8 @@ mod asset_tracing {
         ];
         do_test_asset_tracing(&mut params, &input_templates, &output_templates);
     }
-
+    
+    // The following function generates asset tracing policy from asset tracing keys 
     fn gen_asset_tracing_policy(public_keys: &AssetTracerEncKeys) -> TracingPolicy {
         TracingPolicy {
             enc_keys: public_keys.clone(),
