@@ -40,13 +40,10 @@ ruc = { git = "https://github.com/FindoraNetwork/RUC.git", branch = "master" }
 
 [dev-dependencies]
 bit-array = "0.4.3"
-criterion = "0.3.1"
-criterion-cycles-per-byte = "0.1.1"
 lazy_static = "1.4.0"
 rand = { version = "0.7", default-features = false }
 serde_json = "1.0"
 typenum = "1.11.2"
-bench-utils = { path = "../bench-utils" }
 
 [features]
 default = ["std", "u64_backend"]
@@ -57,51 +54,3 @@ u64_backend = ["curve25519-dalek/u64_backend"]
 u32_backend = ["curve25519-dalek/u32_backend"]
 avx2_backend = ["curve25519-dalek/avx2_backend"]
 
-
-[[bench]]
-name = "xfr_note_idtracking_assettracking_singleasset_time"
-harness = false
-
-[[bench]]
-name = "xfr_note_idtracking_assettracking_singleasset_cycles"
-harness = false
-
-[[bench]]
-name = "xfr_note_idtracking_assettracking_multiasset_time"
-harness = false
-
-[[bench]]
-name = "xfr_note_idtracking_assettracking_multiasset_cycles"
-harness = false
-
-[[bench]]
-name = "xfr_note_noidtracking_noassettracking_singleasset_time"
-harness = false
-
-[[bench]]
-name = "xfr_note_noidtracking_noassettracking_singleasset_cycles"
-harness = false
-
-[[bench]]
-name = "xfr_body_idtracking_assettracking_singleasset_time"
-harness = false
-
-[[bench]]
-name = "xfr_body_idtracking_assettracking_singleasset_cycles"
-harness = false
-
-[[bench]]
-name = "xfr_note_batch_cycles"
-harness = false
-
-[[bench]]
-name = "xfr_note_batch_time"
-harness = false
-
-[[bench]]
-name = "xfr_note_idtracking_noassettracking_singleasset_time"
-harness = false
-
-[[bench]]
-name = "xfr_note_idtracking_noassettracking_singleasset_cycles"
-harness = false

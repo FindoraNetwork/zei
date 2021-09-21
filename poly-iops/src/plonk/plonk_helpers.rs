@@ -234,6 +234,7 @@ pub(super) fn Quotient_polynomial<
     IO: &FpPolynomial<PCS::Field>,
 ) -> Result<FpPolynomial<PCS::Field>> {
     println!(" Quotient_polynomial 0 {:#?}", SystemTime::now());
+    println!(" ZH_inv degree {}", params.Z_H_inv_coset_evals.len());
     let n = cs.size();
     let m = cs.quot_eval_dom_size();
     let factor = m / n;

@@ -1,7 +1,6 @@
 [workspace]
 members = [
  "algebra",
- "bench-utils",
  "crypto",
  "poly-iops",
  "utils",
