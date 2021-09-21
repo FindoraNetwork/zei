@@ -504,6 +504,7 @@ mod test {
         ]
     }
 
+    // The following function tests the correctness property of the solvency proof
     #[test]
     fn test_solvency_correctness() {
         let mut prng = ChaChaRng::from_seed([0u8; 32]);
@@ -568,6 +569,7 @@ mod test {
         assert!(verifier.verify(&bp_gens, &pc_gens, &proof).is_ok());
     }
 
+    // The following function tests the soundness property of the solvency proof
     #[test]
     fn test_solvency_soundness() {
         let mut prng = ChaChaRng::from_seed([0u8; 32]);
