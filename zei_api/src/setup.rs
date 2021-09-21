@@ -139,7 +139,6 @@ impl UserParams {
             &mut ChaChaRng::from_seed([0u8; 32]),
         );
 
-
         let prover_params = preprocess_prover(&cs, &pcs, COMMON_SEED).unwrap();
         UserParams {
             bp_params: PublicParams::new(bp_num_gens),
@@ -158,7 +157,7 @@ impl UserParams {
         bp_num_gens: usize,
         max_degree_poly_com: usize,
     ) -> UserParams {
-        let (cs, /*n_constrains*/_ ) = match tree_depth {
+        let (cs, /*n_constrains*/ _) = match tree_depth {
             Some(depth) => {
                 build_multi_xfr_cs(AMultiXfrWitness::fake(n_payers, n_payees, depth))
             }

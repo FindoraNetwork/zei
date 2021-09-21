@@ -186,12 +186,10 @@ pub mod prover {
         let mut challenges = PlonkChallenges::new();
         let n_constraints = cs.size();
 
-
         println!(" Before Prepare extended witness {:#?}", SystemTime::now());
         // Prepare extended witness
         let extended_witness = cs.extend_witness(witness);
         let IO = PublicVars_polynomial::<PCS>(&params, &online_values);
-
 
         println!(" Before 1 {:#?}", SystemTime::now());
         // 1. build witness polynomials, hide them and commit
@@ -211,13 +209,11 @@ pub mod prover {
             C_witness_polys.push(C_f);
         }
 
-
         println!(" Before 2 {:#?}", SystemTime::now());
         // 2. get challenges gamma and delta
         let gamma = transcript_get_plonk_challenge_gamma(transcript, n_constraints);
         let delta = transcript_get_plonk_challenge_delta(transcript, n_constraints);
         challenges.insert_gamma_delta(gamma, delta).unwrap(); // safe unwrap
-
 
         println!(" Before 3 {:#?}", SystemTime::now());
         // 3. build sigma, hide it and commit
@@ -227,12 +223,10 @@ pub mod prover {
         let (C_Sigma, O_Sigma) = pcs.commit(Sigma).c(d!(PlonkError::CommitmentError))?;
         transcript.append_commitment::<PCS::Commitment>(&C_Sigma);
 
-
         println!(" Before 4 {:#?}", SystemTime::now());
         // 4. get challenge alpha
         let alpha = transcript_get_plonk_challenge_alpha(transcript, n_constraints);
         challenges.insert_alpha(alpha).unwrap();
-
 
         println!(" Before 5 {:#?}", SystemTime::now());
         // 5. build Q, split into `n_wires_per_gate` degree-(N+2) polynomials and commit
@@ -263,11 +257,9 @@ pub mod prover {
 
         println!(" After 8 {:#?}", SystemTime::now());
 
-
         println!(" Before 6 {:#?}", SystemTime::now());
         // 6. get challenge beta
         let beta = transcript_get_plonk_challenge_beta(transcript, n_constraints);
-
 
         println!(" Before 7 {:#?}", SystemTime::now());
         // 7. a) Evaluate the openings of witness/permutation polynomials at beta, and
@@ -307,7 +299,6 @@ pub mod prover {
         let L_eval_beta = pcs.eval_opening(&O_L, &beta);
         transcript.append_field_elem(&Sigma_eval_g_beta);
         transcript.append_field_elem(&L_eval_beta);
-
 
         println!(" Before 8 {:#?}", SystemTime::now());
         // 8. batch eval proofs

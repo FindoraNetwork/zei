@@ -6,6 +6,7 @@ use crypto::basics::hash::rescue::RescueInstance;
 use itertools::Itertools;
 use ruc::Result;
 use std::collections::HashMap;
+use std::time::SystemTime;
 
 // const HASH_SIZE: i32 = 32;             // assuming we are storing SHA256 hash of abar
 // const MAX_KEYS: u64 = u64::MAX;
@@ -43,6 +44,7 @@ pub struct MerkleTree {
 ///
 ///     use zei::anon_xfr::structs::{AnonBlindAssetRecord, OpenAnonBlindAssetRecord};
 ///     use zei::anon_xfr::merkle_tree::MerkleTree;
+///
 ///     let mut mt = MerkleTree::new();
 ///
 ///     let uid0 = mt.add_abar(&AnonBlindAssetRecord::from_oabar(&OpenAnonBlindAssetRecord::default())).unwrap();
@@ -258,6 +260,7 @@ impl MerkleTree {
     }
 
     pub fn get_latest_hash(&self) -> BLSScalar {
+        let _ = SystemTime::now();
         self.root_hash
     }
 
@@ -817,6 +820,7 @@ fn test_abar_proof() {
         vec![abar.clone()]
     );
 
+    println!("Generating CS {:?}", SystemTime::now());
     let mut cs = TurboPlonkConstraintSystem::new();
     let uid_var = cs.new_variable(BLSScalar::from_u64(uid));
     let comm_var = cs.new_variable(abar.amount_type_commitment);
@@ -834,6 +838,7 @@ fn test_abar_proof() {
     let leaf_info = mt.get_mt_leaf_info(uid).unwrap();
     let path_vars = add_merkle_path_variables(&mut cs, leaf_info.path.clone());
     let root_var = compute_merkle_root(&mut cs, elem, &path_vars);
+    println!("Generating CS completed {:?}", SystemTime::now());
 
     // Check Merkle root correctness
     let witness = cs.get_and_clear_witness();

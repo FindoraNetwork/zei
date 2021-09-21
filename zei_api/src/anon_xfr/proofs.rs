@@ -10,8 +10,8 @@ use poly_iops::commitments::kzg_poly_com::KZGCommitmentSchemeBLS;
 use poly_iops::plonk::protocol::prover::{prover, verifier, PlonkPf};
 use rand_core::{CryptoRng, RngCore};
 use ruc::*;
-use utils::errors::ZeiError;
 use std::time::SystemTime;
+use utils::errors::ZeiError;
 
 const ANON_XFR_TRANSCRIPT: &[u8] = b"Anon Xfr";
 const N_INPUTS_TRANSCRIPT: &[u8] = b"Number of input ABARs";
@@ -256,11 +256,12 @@ mod tests {
         let secret_inputs =
             new_multi_xfr_witness_for_test(inputs.to_vec(), outputs.to_vec(), [0u8; 32]);
         let pub_inputs = AMultiXfrPubInputs::from_witness(&secret_inputs);
-        let params = UserParams::new(
+        let params = UserParams::new_max_degree_poly_com(
             n_payers,
             n_payees,
-            Some(1),
+            Some(41),
             DEFAULT_BP_NUM_GENS,
+            1<<20
         );
         let mut prng = ChaChaRng::from_seed([0u8; 32]);
         let proof = prove_xfr(&mut prng, &params, secret_inputs).unwrap();

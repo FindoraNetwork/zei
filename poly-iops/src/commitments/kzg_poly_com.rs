@@ -161,7 +161,7 @@ impl<P: Pairing> KZGCommitmentScheme<P> {
         let mut elem_g1 = P::G1::get_base();
 
         for _ in 0..max_degree + 1 {
-        //for _ in 0..max_degree + 1 {
+            //for _ in 0..max_degree + 1 {
             public_parameter_group_1.push(elem_g1.clone());
             elem_g1 = elem_g1.mul(&s);
         }
@@ -395,8 +395,8 @@ mod tests_kzg_impl {
         let n = 1 << 5;
         let mut prng = ChaChaRng::from_seed([0u8; 32]);
         let kzg_scheme = KZGCommitmentScheme::<P>::new(n, &mut prng);
-        assert_eq!(kzg_scheme.public_parameter_group_1.len(), n + 1 );
-        assert_eq!(kzg_scheme.public_parameter_group_2.len(), 2 );
+        assert_eq!(kzg_scheme.public_parameter_group_1.len(), n + 1);
+        assert_eq!(kzg_scheme.public_parameter_group_2.len(), 2);
     }
 
     #[test]

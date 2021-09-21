@@ -161,7 +161,11 @@ pub trait PolyComScheme {
         assert!(n > 0);
         Self::init_pcs_batch_eval_transcript(transcript, max_degree, points, params);
 
-        println!("batch_prove_eval 1 {:#?}, openings_n: {}", SystemTime::now(), openings.len());
+        println!(
+            "batch_prove_eval 1 {:#?}, openings_n: {}",
+            SystemTime::now(),
+            openings.len()
+        );
         // 1. Compute quotient Polynomial q(X) = h(X)/z(X), where
         // h(X) = \sum_i \alpha^i * z_i_bar(X) * [fi(X) - fi(xi)]
         let alpha = transcript.get_challenge_field_elem(b"alpha"); // linear combination scalar factor
@@ -190,24 +194,20 @@ pub trait PolyComScheme {
             return Err(eg!());
         }
 
-
         println!("batch_prove_eval 3 {:#?}", SystemTime::now());
         let (C_q, O_q) = self.commit(q).c(d!())?;
         transcript.append_commitment::<Self::Commitment>(&C_q);
-
 
         println!("batch_prove_eval 4 {:#?}", SystemTime::now());
         // Derive opening of g(X) = sum \alpha^i * z_i_bar(\rho) * (fi(X) - fi(xi)) - q(X) * z(rho)
         // = - z(rho) * q(X) + sum \alpha^i * z_i_bar(\rho) * fi(X) - [sum \alpha^i * z_i_bar(\rho) * fi(xi)]
         let rho = transcript.get_challenge_field_elem(b"rho");
 
-
         println!("batch_prove_eval 5 {:#?}", SystemTime::now());
         // term `-z(rho) * q(X)`
         let mut g_opening = O_q.inv();
         let z_eval_rho = z.eval(&rho);
         g_opening = g_opening.exp(&z_eval_rho);
-
 
         println!("batch_prove_eval 6 {:#?}", SystemTime::now());
         // term `\sum \alpha^i * z_i_bar(\rho) * fi(X)`
@@ -228,13 +228,11 @@ pub trait PolyComScheme {
             c_i.mul_assign(&alpha);
         }
 
-
         println!("batch_prove_eval 7 {:#?}", SystemTime::now());
         // term `-[sum \alpha^i * z_i_bar(\rho) * fi(xi)]`
         let poly_values_sum_opening =
             self.opening(&FpPolynomial::from_coefs(vec![val_sum]));
         g_opening = g_opening.op(&poly_values_sum_opening.inv());
-
 
         println!("batch_prove_eval 8 {:#?}", SystemTime::now());
         let (g_value, g_proof) = self

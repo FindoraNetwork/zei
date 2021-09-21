@@ -693,6 +693,8 @@ fn elgamal_hybrid_encrypt(
 #[cfg(test)]
 pub(crate) mod tests {
     use super::*;
+    use crate::anon_xfr::merkle_tree::MerkleTree;
+    use crate::anon_xfr::structs::AnonBlindAssetRecord;
     use algebra::bls12_381::BLSScalar;
     use algebra::groups::{One, Scalar, Zero};
     use crypto::basics::commitments::pedersen::PedersenGens;
@@ -710,6 +712,8 @@ pub(crate) mod tests {
         outputs: Vec<(u64, BLSScalar)>,
         seed: [u8; 32],
     ) -> AMultiXfrWitness {
+        let mut mt = MerkleTree::new();
+
         let n_payers = inputs.len();
         assert!(n_payers <= 3);
         let mut prng = ChaChaRng::from_seed(seed);
@@ -718,25 +722,29 @@ pub(crate) mod tests {
             .iter()
             .enumerate()
             .map(|(i, &(amount, asset_type))| {
-                let (is_left_child, is_right_child) = match i % 3 {
-                    0 => (1, 0),
-                    1 => (0, 0),
-                    _ => (0, 1),
-                };
-                let node = MTNode {
-                    siblings1: zero,
-                    siblings2: zero,
-                    is_left_child,
-                    is_right_child,
-                };
+                let sec_key = JubjubScalar::random(&mut prng);
+                let blind = BLSScalar::random(&mut prng);
+                let base = JubjubPoint::get_base();
+                let pk_point = base.mul(&sec_key);
+                let comm = CommScheme::new();
+                let commitment = comm
+                    .commit(&blind, &[BLSScalar::from_u64(amount), asset_type])
+                    .unwrap();
+                let uid = mt
+                    .add_abar(&AnonBlindAssetRecord {
+                        amount_type_commitment: commitment,
+                        public_key: AXfrPubKey::from_jubjub_point(pk_point),
+                    })
+                    .unwrap();
+                let _ = mt.commit();
                 PayerSecret {
-                    sec_key: JubjubScalar::random(&mut prng),
+                    sec_key,
                     diversifier: JubjubScalar::random(&mut prng),
                     uid: i as u64,
                     amount,
                     asset_type,
-                    path: MTPath::new(vec![node]),
-                    blind: BLSScalar::random(&mut prng),
+                    path: mt.get_mt_leaf_info(uid).unwrap().path,
+                    blind,
                 }
             })
             .collect();
