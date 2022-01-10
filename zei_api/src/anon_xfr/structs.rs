@@ -91,6 +91,8 @@ pub struct AXfrBody {
 #[derive(Debug, PartialEq, Serialize, Deserialize, Clone, Eq)]
 pub struct AnonBlindAssetRecord {
     pub amount_type_commitment: Commitment,
+    pub amount_commitment: Commitment,
+    pub type_commitment: Commitment,
     pub public_key: AXfrPubKey,
 }
 
@@ -99,6 +101,8 @@ impl AnonBlindAssetRecord {
         let rand_pub_key = oabar.pub_key_ref().randomize(&oabar.key_rand_factor);
         AnonBlindAssetRecord {
             amount_type_commitment: oabar.compute_commitment(),
+            amount_commitment: oabar.compute_amount_commitment(),
+            asset_type_commitment: oabar.compute_asset_type_commitment(),
             public_key: rand_pub_key,
         }
     }
@@ -173,6 +177,32 @@ impl OpenAnonBlindAssetRecord {
     /// Get record's owner memo
     pub fn get_owner_memo(&self) -> Option<OwnerMemo> {
         self.owner_memo.clone()
+    }
+
+    /// computes record's amount commitment
+    pub fn compute_amount_commitment(&self) -> Commitment {
+        rescue::HashCommitment::new()
+            .commit(
+                &self.blind,
+                &[
+                    BLSScalar::from_u64(self.amount)
+                ],
+            )
+            .unwrap()
+        // safe unwrap
+    }
+
+    // computes record's asset type commitment
+    pub fn compute_asset_type_commitment(&self) -> Commitment {
+        rescue::HashCommitment::new()
+            .commit(
+                &self.blind,
+                &[
+                    self.asset_type.as_scalar()
+                ],
+            )
+            .unwrap()
+        // safe unwrap
     }
 
     /// computes record's amount||asset type commitment
