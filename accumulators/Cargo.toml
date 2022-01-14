@@ -14,6 +14,6 @@ algebra = { path = "../algebra" }
 crypto = { path = "../crypto" }
 itertools = "0.8.0"
 storage = { git = "https://github.com/FindoraNetwork/storage.git", branch = "develop" }
-ruc = "0.6.2"
+ruc = "1.0"
 utils = { path = "../utils" }
 parking_lot = "0.11.2"
