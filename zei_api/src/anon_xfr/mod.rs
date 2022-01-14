@@ -113,7 +113,7 @@ pub fn gen_anon_xfr_body<R: CryptoRng + RngCore>(
 
     let out_abars = outputs
         .iter()
-        .map(|output| AnonBlindAssetRecord::from_oabar(output))
+        .map(AnonBlindAssetRecord::from_oabar)
         .collect_vec();
     let out_memos: Result<Vec<OwnerMemo>> = outputs
         .iter()
@@ -945,12 +945,12 @@ mod tests {
                 .collect_vec();
 
             // empty inputs/outputs
-            err_eq!(
+            msg_eq!(
                 ZeiError::AXfrProverParamsError,
                 gen_anon_xfr_body(&mut prng, &user_params, &[], &open_abars_out, &[])
                     .unwrap_err(),
             );
-            err_eq!(
+            msg_eq!(
                 ZeiError::AXfrProverParamsError,
                 gen_anon_xfr_body(
                     &mut prng,
@@ -1036,10 +1036,8 @@ mod tests {
 
         let dec_keys_in: Vec<XSecretKey> =
             (0..n).map(|_| XSecretKey::new(prng)).collect();
-        let enc_keys_in: Vec<XPublicKey> = dec_keys_in
-            .iter()
-            .map(|dec_key| XPublicKey::from(dec_key))
-            .collect();
+        let enc_keys_in: Vec<XPublicKey> =
+            dec_keys_in.iter().map(XPublicKey::from).collect();
         (keypairs_in, dec_keys_in, enc_keys_in)
     }
 

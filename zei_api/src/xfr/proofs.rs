@@ -825,7 +825,7 @@ mod tests {
             sig_commitments.as_slice(),
         );
 
-        err_eq!(
+        msg_eq!(
             ZeiError::XfrVerifyAssetTracingIdentityError,
             res.unwrap_err()
         );
@@ -847,7 +847,7 @@ mod tests {
             sig_commitments.as_slice(),
         );
 
-        err_eq!(
+        msg_eq!(
             ZeiError::XfrVerifyAssetTracingIdentityError,
             res.unwrap_err()
         );
@@ -870,7 +870,7 @@ mod tests {
             sig_commitments.as_slice(),
         );
 
-        err_eq!(
+        msg_eq!(
             ZeiError::XfrVerifyAssetTracingIdentityError,
             res.unwrap_err()
         );

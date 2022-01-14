@@ -13,12 +13,12 @@ use std::io::Write;
 use std::path::PathBuf;
 
 #[macro_export]
-macro_rules! err_eq {
+macro_rules! msg_eq {
     ($zei_err: expr, $ruc_err: expr $(,)?) => {
-        assert!($ruc_err.eq_any(ruc::eg!($zei_err).as_ref()));
+        assert!($ruc_err.msg_has_overloop(ruc::eg!($zei_err).as_ref()));
     };
     ($zei_err: expr, $ruc_err: expr, $msg: expr $(,)?) => {
-        assert!($ruc_err.eq_any(ruc::eg!($zei_err).as_ref()), $msg);
+        assert!($ruc_err.msg_has_overloop(ruc::eg!($zei_err).as_ref()), $msg);
     };
 }
 

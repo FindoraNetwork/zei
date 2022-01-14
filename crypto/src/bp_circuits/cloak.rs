@@ -271,7 +271,7 @@ pub(super) fn sort_and_merge<CS: RandomizableConstraintSystem>(
         return Ok((0, vars));
     }
     let mut n_gates = 0;
-    let sorted_values = values.map(|v| sort(v));
+    let sorted_values = values.map(sort);
     let merged_values = sorted_values
         .as_ref()
         .map(|sorted| merge(sorted.as_slice()));

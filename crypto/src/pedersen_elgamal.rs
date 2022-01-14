@@ -452,7 +452,7 @@ mod test {
             &proof,
         );
         assert_eq!(true, verify.is_err());
-        err_eq!(ZeiError::ZKProofVerificationError, verify.unwrap_err());
+        msg_eq!(ZeiError::ZKProofVerificationError, verify.unwrap_err());
     }
 
     #[test]
@@ -591,7 +591,7 @@ mod test {
             &proof,
         );
         assert!(verify.is_err());
-        err_eq!(ZeiError::ZKProofBatchVerificationError, verify.unwrap_err());
+        msg_eq!(ZeiError::ZKProofBatchVerificationError, verify.unwrap_err());
 
         let mut prover_transcript = Transcript::new(b"test");
         let mut verifier_transcript = Transcript::new(b"test");
@@ -614,7 +614,7 @@ mod test {
             &proof,
         );
         assert!(verify.is_err());
-        err_eq!(ZeiError::ZKProofBatchVerificationError, verify.unwrap_err());
+        msg_eq!(ZeiError::ZKProofBatchVerificationError, verify.unwrap_err());
 
         let mut prover_transcript = Transcript::new(b"test");
         let mut verifier_transcript = Transcript::new(b"test");
@@ -638,7 +638,7 @@ mod test {
             &proof,
         );
         assert!(verify.is_err());
-        err_eq!(ZeiError::ZKProofBatchVerificationError, verify.unwrap_err());
+        msg_eq!(ZeiError::ZKProofBatchVerificationError, verify.unwrap_err());
     }
 
     #[test]

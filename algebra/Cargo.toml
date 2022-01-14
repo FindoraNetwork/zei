@@ -22,7 +22,7 @@ ff = "0.7.0"
 digest = "0.9"
 jubjub = "0.4.0"
 bls12_381 = "0.2.0"
-ruc = "0.6.2"
+ruc = "1.0"
 wasm-bindgen = { version = "0.2.50", features = ["serde-serialize"]  }
 
 [features]

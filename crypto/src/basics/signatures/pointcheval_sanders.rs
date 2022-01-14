@@ -115,7 +115,7 @@ pub fn ps_sign_scalar<R: CryptoRng + RngCore, P: Pairing>(
 /// #Example
 /// ```
 /// use crypto::basics::signatures::pointcheval_sanders::{ps_gen_keys, ps_sign_bytes, ps_verify_sig_bytes};
-/// use utils::{errors::ZeiError, err_eq};
+/// use utils::{errors::ZeiError, msg_eq};
 /// use algebra::bls12_381::Bls12381;
 /// use rand::thread_rng;
 /// use ruc::err::*;
@@ -123,7 +123,7 @@ pub fn ps_sign_scalar<R: CryptoRng + RngCore, P: Pairing>(
 /// let (pk, sk) = ps_gen_keys::<_, Bls12381>(&mut thread_rng());
 /// let sig = ps_sign_bytes::<_, Bls12381>(&mut thread_rng(), &sk, b"this is a message");
 /// assert!(ps_verify_sig_bytes::<Bls12381>(&pk, b"this is a message", &sig).is_ok());
-/// err_eq!(ZeiError::SignatureError, ps_verify_sig_bytes::<Bls12381>(&pk, b"this is ANOTHER message", &sig).unwrap_err());
+/// msg_eq!(ZeiError::SignatureError, ps_verify_sig_bytes::<Bls12381>(&pk, b"this is ANOTHER message", &sig).unwrap_err());
 /// ```
 pub fn ps_verify_sig_bytes<P: Pairing>(
     pk: &PSPublicKey<P::G2>,
@@ -141,13 +141,13 @@ pub fn ps_verify_sig_bytes<P: Pairing>(
 /// use algebra::bls12_381::{BLSScalar, Bls12381};
 /// use algebra::groups::Scalar;
 /// use rand::thread_rng;
-/// use utils::{errors::ZeiError, err_eq};
+/// use utils::{errors::ZeiError, msg_eq};
 /// use ruc::err::*;
 ///
 /// let (pk, sk) = ps_gen_keys::<_, Bls12381>(&mut thread_rng());
 /// let sig = ps_sign_scalar::<_, Bls12381>(&mut thread_rng(), &sk, &BLSScalar::from_u32(100));
 /// assert!(ps_verify_sig_scalar::<Bls12381>(&pk, &BLSScalar::from_u32(100), &sig).is_ok());
-/// err_eq!(ZeiError::SignatureError, ps_verify_sig_scalar::<Bls12381>(&pk, &BLSScalar::from_u32(333), &sig).unwrap_err());
+/// msg_eq!(ZeiError::SignatureError, ps_verify_sig_scalar::<Bls12381>(&pk, &BLSScalar::from_u32(333), &sig).unwrap_err());
 /// ```
 pub fn ps_verify_sig_scalar<P: Pairing>(
     pk: &PSPublicKey<P::G2>,

@@ -158,7 +158,7 @@ fn do_transfer_tests_single_asset(
         outputs.as_slice(),
         inkeys_ref.as_slice(),
     );
-    err_eq!(
+    msg_eq!(
         ZeiError::XfrCreationAssetAmountError,
         xfr_note.unwrap_err(),
         "Xfr cannot be build if output total amount is greater than input amounts"
@@ -215,7 +215,7 @@ fn do_transfer_tests_single_asset(
         outputs.as_slice(),
         inkeys_ref.as_slice(),
     );
-    err_eq!(
+    msg_eq!(
         ZeiError::XfrCreationAssetAmountError,
         xfr_note.unwrap_err(),
         "Xfr cannot be build if output asset types are different"
@@ -280,7 +280,7 @@ fn do_transfer_tests_single_asset(
         inkeys_ref.as_slice(),
     );
 
-    err_eq!(
+    msg_eq!(
         ZeiError::XfrCreationAssetAmountError,
         xfr_note.unwrap_err(),
         "Xfr cannot be build if output asset types are different"
@@ -644,7 +644,7 @@ mod multi_asset_no_tracing {
         xfr_note.multisig =
             compute_transfer_multisig(&xfr_note.body, inkeys_ref.as_slice()).unwrap();
 
-        err_eq!(
+        msg_eq!(
             ZeiError::XfrVerifyAssetAmountError,
             verify_xfr_note(&mut prng, &mut params, &xfr_note, &policies.to_ref())
                 .unwrap_err(),
@@ -715,7 +715,7 @@ mod keys {
             outputs.as_slice(),
             &[], //no keys
         );
-        err_eq!(ZeiError::ParameterError, xfr_note.unwrap_err());
+        msg_eq!(ZeiError::ParameterError, xfr_note.unwrap_err());
 
         let key1 = XfrKeyPair::generate(&mut prng);
         let key2 = XfrKeyPair::generate(&mut prng);
@@ -726,7 +726,7 @@ mod keys {
             &[&key1, &key2],
         );
 
-        err_eq!(ZeiError::ParameterError, xfr_note.unwrap_err());
+        msg_eq!(ZeiError::ParameterError, xfr_note.unwrap_err());
     }
 }
 
@@ -837,7 +837,7 @@ mod identity_tracing {
             vec![null_policies_input],
             vec![None; 1],
         );
-        err_eq!(
+        msg_eq!(
             XfrVerifyAssetTracingIdentityError,
             verify_xfr_note(&mut prng, &mut params, &xfr_note, &policies).unwrap_err(),
         );
@@ -1082,7 +1082,7 @@ mod asset_tracing {
                 output_sig_commitment.clone(),
             );
 
-            err_eq!(
+            msg_eq!(
                 XfrVerifyAssetTracingAssetAmountError,
                 verify_xfr_body(&mut prng, params, &new_xfr_body, &policies)
                     .unwrap_err(),
@@ -1102,7 +1102,7 @@ mod asset_tracing {
 
         let check = verify_xfr_body(&mut prng, params, &new_xfr_body, &policies);
 
-        err_eq!(
+        msg_eq!(
             XfrVerifyAssetTracingAssetAmountError,
             check.unwrap_err(),
             "Transfer should fail without proof."
@@ -1124,7 +1124,7 @@ mod asset_tracing {
 
         let check = verify_xfr_body(&mut prng, params, &new_xfr_body, &policies);
 
-        err_eq!(
+        msg_eq!(
             XfrVerifyAssetTracingAssetAmountError,
             check.unwrap_err(),
             "Transfer should fail as the proof is not correctly computed."
@@ -1824,7 +1824,7 @@ mod asset_tracing {
         xfr_body_new.outputs[0].amount = NonConfidential(1_u64);
         xfr_body_new.outputs[1].amount = NonConfidential(u64::max_value());
 
-        err_eq!(
+        msg_eq!(
             ZeiError::XfrVerifyAssetAmountError,
             verify_xfr_body(&mut prng, &mut params, &xfr_body_new, &policies_ref)
                 .unwrap_err(),

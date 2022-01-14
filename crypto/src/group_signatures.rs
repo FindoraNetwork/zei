@@ -326,7 +326,7 @@ mod tests {
         assert!(gpsig_verify(&gpk, &sig, b"Some message").is_ok());
 
         // Incorrect message
-        err_eq!(
+        msg_eq!(
             ZeiError::ZKProofVerificationError,
             gpsig_verify(&gpk, &sig, b"Wrong message").unwrap_err()
         );
@@ -334,7 +334,7 @@ mod tests {
         // Use of another group public key
         let (another_gpk, _) = gpsig_setup(&mut prng);
         let sig = gpsig_sign(&mut prng, &gpk, &join_cert, b"Some message");
-        err_eq!(
+        msg_eq!(
             ZeiError::ZKProofVerificationError,
             gpsig_verify(&another_gpk, &sig, b"Some message").unwrap_err()
         );

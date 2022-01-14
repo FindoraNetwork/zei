@@ -646,12 +646,12 @@ impl XfrNotePolicies {
                 self.inputs_tracing_policies.iter().collect_vec(),
                 self.inputs_sig_commitments
                     .iter()
-                    .map(|x| if_some_closure(x))
+                    .map(if_some_closure)
                     .collect_vec(),
                 self.outputs_tracing_policies.iter().collect_vec(),
                 self.outputs_sig_commitments
                     .iter()
-                    .map(|x| if_some_closure(x))
+                    .map(if_some_closure)
                     .collect_vec(),
             )
         } else {

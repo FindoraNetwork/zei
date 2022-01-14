@@ -451,7 +451,7 @@ pub(crate) mod test_helper {
             &conf_reveal_proof.pok,
             proof_message,
         );
-        err_eq!(
+        msg_eq!(
             ZeiError::IdentityRevealVerifyError,
             vrfy.unwrap_err(),
             "proof should fail, reveal map doesn't match"
@@ -468,7 +468,7 @@ pub(crate) mod test_helper {
             &conf_reveal_proof.pok,
             proof_message,
         );
-        err_eq!(
+        msg_eq!(
             ZeiError::ParameterError,
             vrfy.unwrap_err(),
             "proof should fail, bitmap length does not match number of attributes"
@@ -485,7 +485,7 @@ pub(crate) mod test_helper {
             &conf_reveal_proof.pok,
             proof_message,
         );
-        err_eq!(
+        msg_eq!(
             ZeiError::IdentityRevealVerifyError,
             vrfy.unwrap_err(),
             "proof should fail, bad ac issuer public key"
@@ -503,7 +503,7 @@ pub(crate) mod test_helper {
             &conf_reveal_proof.pok,
             proof_message,
         );
-        err_eq!(
+        msg_eq!(
             ZeiError::IdentityRevealVerifyError,
             vrfy.unwrap_err(),
             "proof should fail, bad encryption key"
@@ -520,7 +520,7 @@ pub(crate) mod test_helper {
             &conf_reveal_proof.pok,
             wrong_message,
         );
-        err_eq!(
+        msg_eq!(
             ZeiError::IdentityRevealVerifyError,
             vrfy.unwrap_err(),
             "proof should fail, bad sok message"

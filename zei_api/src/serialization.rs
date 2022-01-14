@@ -1,6 +1,5 @@
 use crate::xfr::sig::{XfrPublicKey, XfrSecretKey, XfrSignature};
 use crate::xfr::structs::{AssetType, ASSET_TYPE_LENGTH};
-use ed25519_dalek::ed25519::signature::Signature;
 use ed25519_dalek::{PublicKey, SecretKey};
 use ruc::*;
 use serde::Serializer;

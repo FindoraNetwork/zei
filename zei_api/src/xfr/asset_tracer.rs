@@ -332,12 +332,12 @@ mod tests {
             &[],
         );
 
-        err_eq!(
+        msg_eq!(
             ZeiError::ParameterError,
             memo.extract_asset_type(&tracer_keys.dec_key.record_data_dec_key, &[])
                 .unwrap_err(),
         );
-        err_eq!(
+        msg_eq!(
             ZeiError::AssetTracingExtractionError,
             memo.extract_asset_type(
                 &tracer_keys.dec_key.record_data_dec_key,
@@ -345,7 +345,7 @@ mod tests {
             )
             .unwrap_err(),
         );
-        err_eq!(
+        msg_eq!(
             ZeiError::AssetTracingExtractionError,
             memo.extract_asset_type(
                 &tracer_keys.dec_key.record_data_dec_key,
@@ -421,12 +421,12 @@ mod tests {
             &attrs_and_ctexts,
         );
 
-        err_eq!(
+        msg_eq!(
             ZeiError::ParameterError,
             memo.verify_identity_attributes(&tracer_keys.dec_key.attrs_dec_key, &[1u32])
                 .unwrap_err(),
         );
-        err_eq!(
+        msg_eq!(
             ZeiError::ParameterError,
             memo.verify_identity_attributes(
                 &tracer_keys.dec_key.attrs_dec_key,

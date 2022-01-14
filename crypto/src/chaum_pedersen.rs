@@ -466,7 +466,7 @@ mod test {
         );
 
         let mut verifier_transcript = Transcript::new(b"test");
-        err_eq!(
+        msg_eq!(
             ZeiError::ZKProofVerificationError,
             chaum_pedersen_verify_eq(
                 &mut verifier_transcript,
@@ -489,7 +489,7 @@ mod test {
             (&c2, &bf2),
         );
         let mut verifier_transcript = Transcript::new(b"test");
-        err_eq!(
+        msg_eq!(
             ZeiError::ZKProofVerificationError,
             chaum_pedersen_verify_eq(
                 &mut verifier_transcript,
@@ -552,7 +552,7 @@ mod test {
         .unwrap();
 
         let mut verifier_transcript = Transcript::new(b"Test");
-        err_eq!(
+        msg_eq!(
             ZeiError::ZKProofVerificationError,
             chaum_pedersen_verify_multiple_eq(
                 &mut verifier_transcript,
@@ -619,7 +619,7 @@ mod test {
         .unwrap();
 
         let mut verifier_transcript = Transcript::new(b"Test");
-        err_eq!(
+        msg_eq!(
             ZeiError::ZKProofVerificationError,
             chaum_pedersen_verify_multiple_eq(
                 &mut verifier_transcript,

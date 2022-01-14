@@ -265,7 +265,7 @@ mod elgamal_test {
         let err = super::elgamal_verify(&base, &wrong_m, &ctext, &secret_key)
             .err()
             .unwrap();
-        err_eq!(ZeiError::ElGamalVerificationError, err);
+        msg_eq!(ZeiError::ElGamalVerificationError, err);
     }
 
     fn decryption<G: Group>() {
@@ -293,12 +293,12 @@ mod elgamal_test {
         let err = super::elgamal_decrypt_hinted(&base, &ctext, &secret_key, 0, 50)
             .err()
             .unwrap();
-        err_eq!(ZeiError::ElGamalDecryptionError, err);
+        msg_eq!(ZeiError::ElGamalDecryptionError, err);
 
         let err = super::elgamal_decrypt_hinted(&base, &ctext, &secret_key, 200, 300)
             .err()
             .unwrap();
-        err_eq!(ZeiError::ElGamalDecryptionError, err);
+        msg_eq!(ZeiError::ElGamalDecryptionError, err);
 
         let m = G::S::from_u64(u64::max_value());
         let ctext = super::elgamal_encrypt(&base, &m, &r, &public_key);
@@ -307,7 +307,7 @@ mod elgamal_test {
         let err = super::elgamal_decrypt_hinted(&base, &ctext, &secret_key, 200, 300)
             .err()
             .unwrap();
-        err_eq!(ZeiError::ElGamalDecryptionError, err);
+        msg_eq!(ZeiError::ElGamalDecryptionError, err);
     }
 
     fn serialize_to_json<G: Group>() {

@@ -4,8 +4,8 @@ pub(crate) mod examples {
     use rand::SeedableRng;
     use rand_chacha::ChaChaRng;
     use ruc::*;
-    use utils::err_eq;
     use utils::errors::ZeiError;
+    use utils::msg_eq;
     use wasm_bindgen::__rt::std::collections::HashMap;
     use zei::api::anon_creds;
     use zei::api::anon_creds::{
@@ -338,7 +338,7 @@ pub(crate) mod examples {
         let records_data = match trace_assets(&xfr_note.body, &tracer_keys) {
             Ok(data) => data,
             Err(e) => {
-                err_eq!(ZeiError::BogusAssetTracerMemo, e);
+                msg_eq!(ZeiError::BogusAssetTracerMemo, e);
                 // User may choose to call brute_force decrypt to get the correct information
                 pnk!(trace_assets_brute_force(
                     &xfr_note.body,
@@ -495,7 +495,7 @@ pub(crate) mod examples {
         let records_data = match trace_assets(&xfr_note.body, &asset_tracing_key_pair) {
             Ok(data) => data,
             Err(e) => {
-                err_eq!(ZeiError::BogusAssetTracerMemo, e);
+                msg_eq!(ZeiError::BogusAssetTracerMemo, e);
                 // User may choose to call brute_force decrypt to get the correct information
                 pnk!(trace_assets_brute_force(
                     &xfr_note.body,
@@ -713,7 +713,7 @@ pub(crate) mod examples {
         let records_data = match trace_assets(&xfr_note.body, &tracer_keys) {
             Ok(data) => data,
             Err(e) => {
-                err_eq!(ZeiError::BogusAssetTracerMemo, e);
+                msg_eq!(ZeiError::BogusAssetTracerMemo, e);
                 // User may choose to call brute_force decrypt to get the correct information
                 pnk!(trace_assets_brute_force(
                     &xfr_note.body,
@@ -949,7 +949,7 @@ pub(crate) mod examples {
         let records_data = match trace_assets(&xfr_note.body, &tracer_keys) {
             Ok(data) => data,
             Err(e) => {
-                err_eq!(ZeiError::BogusAssetTracerMemo, e);
+                msg_eq!(ZeiError::BogusAssetTracerMemo, e);
                 // User may choose to call brute_force decrypt to get the correct information
                 pnk!(trace_assets_brute_force(
                     &xfr_note.body,

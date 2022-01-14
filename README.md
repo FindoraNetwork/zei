@@ -1,4 +1,9 @@
 ![](https://tokei.rs/b1/github/FindoraNetwork/zei)
+![GitHub top language](https://img.shields.io/github/languages/top/FindoraNetwork/zei)
+![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/FindoraNetwork/zei)
+![GitHub issues](https://img.shields.io/github/issues-raw/FindoraNetwork/zei)
+![GitHub pull requests](https://img.shields.io/github/issues-pr-raw/FindoraNetwork/zei)
+![License](https://img.shields.io/badge/license-BUSL--1.1-lightgreen)
 
 #**Zei: Findora's Cryptographic Library**
 

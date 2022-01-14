@@ -249,7 +249,7 @@ mod test {
         let keypair = XfrKeyPair::generate(&mut prng);
         let message = [10u8; 500];
         let sig = keypair.sign(&message);
-        err_eq!(
+        msg_eq!(
             dbg!(SignatureError),
             dbg!(keypair.pub_key.verify("".as_bytes(), &sig).unwrap_err()),
             "Verifying sig on different message should have return Err(Signature Error)"
@@ -257,7 +257,7 @@ mod test {
         pnk!(keypair.pub_key.verify(&message, &sig));
         //test again with secret key
         let sig = keypair.sec_key.sign(&message, &keypair.pub_key);
-        err_eq!(
+        msg_eq!(
             SignatureError,
             keypair.pub_key.verify("".as_bytes(), &sig).unwrap_err(),
             "Verifying sig on different message should have return Err(Signature Error)"
@@ -266,7 +266,7 @@ mod test {
 
         // test with different keys
         let keypair = XfrKeyPair::generate(&mut prng);
-        err_eq!(
+        msg_eq!(
             SignatureError,
             keypair.pub_key.verify(&message, &sig).unwrap_err(),
             "Verifying sig on with a different key should have return Err(Signature Error)"

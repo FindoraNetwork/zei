@@ -472,16 +472,16 @@ mod schnorr_sigs {
 
             let wrong_message = b"wrong_message";
             let res = multisig_verify(&public_keys, wrong_message, &msig);
-            err_eq!(ZeiError::SignatureError, res.unwrap_err());
+            msg_eq!(ZeiError::SignatureError, res.unwrap_err());
 
             let too_short_multi_sig = MultiSignature(msig.0.clone()[0..2].to_vec());
             let res = multisig_verify(&public_keys, message, &too_short_multi_sig);
-            err_eq!(ZeiError::ParameterError, res.unwrap_err());
+            msg_eq!(ZeiError::ParameterError, res.unwrap_err());
 
             let empty_msig: MultiSignature<G> = MultiSignature(vec![]);
             let empty_public_keys = vec![];
             let res = multisig_verify(&empty_public_keys, message, &empty_msig);
-            err_eq!(ZeiError::ParameterError, res.unwrap_err());
+            msg_eq!(ZeiError::ParameterError, res.unwrap_err());
         }
 
         #[test]
