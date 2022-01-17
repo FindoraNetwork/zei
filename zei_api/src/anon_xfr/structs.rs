@@ -56,6 +56,7 @@ impl AXfrNote {
         for keypair in keypairs {
             signatures.push(keypair.sign(msg.as_slice()))
         }
+        println!("generate_note_from_body {:?}", msg);
 
         Ok(AXfrNote { body, signatures })
     }
@@ -64,6 +65,8 @@ impl AXfrNote {
         let msg: Vec<u8> = bincode::serialize(&self.body)
             .map_err(|_| ZeiError::SerializationError)
             .c(d!())?;
+
+        println!("verify {:?}", msg);
 
         self.body
             .inputs
