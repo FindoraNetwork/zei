@@ -56,7 +56,8 @@ impl AXfrNote {
         for keypair in keypairs {
             signatures.push(keypair.sign(msg.as_slice()))
         }
-        println!("generate_note_from_body {:?}", msg);
+        println!("generate_note_from_body {:?}", signatures);
+
 
         Ok(AXfrNote { body, signatures })
     }
@@ -66,7 +67,7 @@ impl AXfrNote {
             .map_err(|_| ZeiError::SerializationError)
             .c(d!())?;
 
-        println!("verify {:?}", msg);
+        println!("verify {:?}", self.signatures);
 
         self.body
             .inputs
