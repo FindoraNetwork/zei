@@ -3,18 +3,20 @@ use crate::anon_xfr::circuits::{
 };
 use crate::anon_xfr::keys::AXfrKeyPair;
 use crate::anon_xfr::proofs::{prove_xfr, verify_xfr};
-use crate::anon_xfr::structs::{AXfrBody, AXfrProof, AnonBlindAssetRecord, OpenAnonBlindAssetRecord};
+use crate::anon_xfr::structs::{
+    AXfrBody, AXfrProof, AnonBlindAssetRecord, OpenAnonBlindAssetRecord,
+};
 use crate::setup::{NodeParams, UserParams};
 use crate::xfr::structs::{AssetType, OwnerMemo, ASSET_TYPE_LENGTH};
 use algebra::bls12_381::{BLSScalar, BLS_SCALAR_LEN};
 use algebra::groups::{Scalar, ScalarArithmetic, Zero};
 use algebra::jubjub::{JubjubScalar, JUBJUB_SCALAR_LEN};
+use crypto::basics::hash::rescue::RescueInstance;
 use crypto::basics::hybrid_encryption::{
     hybrid_decrypt_with_x25519_secret_key,
     //hybrid_encrypt_with_x25519_key,
     XSecretKey,
 };
-use crypto::basics::hash::rescue::RescueInstance;
 use crypto::basics::prf::PRF;
 use itertools::Itertools;
 use rand_core::{CryptoRng, RngCore};
@@ -25,9 +27,9 @@ use utils::errors::ZeiError;
 pub mod bar_to_from_abar;
 pub(crate) mod circuits;
 pub mod keys;
+mod merkle_tree_test;
 pub(crate) mod proofs;
 pub mod structs;
-mod merkle_tree_test;
 
 /// Build a anonymous transfer structure AXfrBody. It also returns randomized signature keys to sign the transfer,
 /// * `rng` - pseudo-random generator.
@@ -295,8 +297,6 @@ fn nullifier(
     )
 }
 
-
-
 pub fn hash_abar(uid: u64, abar: &AnonBlindAssetRecord) -> BLSScalar {
     let hash = RescueInstance::new();
 
@@ -317,20 +317,18 @@ pub fn hash_abar(uid: u64, abar: &AnonBlindAssetRecord) -> BLSScalar {
 
 #[cfg(test)]
 mod tests {
-    use std::sync::{Arc};
-    use std::thread;
-    use accumulators::merkle_tree::{PersistentMerkleTree, Proof};
+    use crate::anon_xfr::{gen_anon_xfr_body, verify_anon_xfr_body};
     use crate::anon_xfr::{
         hash_abar,
         keys::AXfrKeyPair,
         structs::{
             AXfrNote, AnonBlindAssetRecord, MTLeafInfo, MTNode, MTPath,
             OpenAnonBlindAssetRecord, OpenAnonBlindAssetRecordBuilder,
-        }
+        },
     };
-    use crate::anon_xfr::{gen_anon_xfr_body, verify_anon_xfr_body};
     use crate::setup::{NodeParams, UserParams, DEFAULT_BP_NUM_GENS};
     use crate::xfr::structs::AssetType;
+    use accumulators::merkle_tree::{PersistentMerkleTree, Proof};
     use algebra::bls12_381::BLSScalar;
     use algebra::groups::{One, Scalar, ScalarArithmetic, Zero};
     use crypto::basics::hash::rescue::RescueInstance;
@@ -341,26 +339,30 @@ mod tests {
     use rand_core::SeedableRng;
     use rand_core::{CryptoRng, RngCore};
     use ruc::*;
+    use std::sync::Arc;
+    use std::thread;
     use storage::db::TempRocksDB;
     use storage::state::{ChainState, State};
     use storage::store::PrefixedStore;
     use utils::errors::ZeiError;
 
     pub fn create_mt_leaf_info(proof: Proof) -> MTLeafInfo {
-        MTLeafInfo{
+        MTLeafInfo {
             path: MTPath {
-                nodes: proof.nodes.iter().map(|e| {
-                    MTNode{
+                nodes: proof
+                    .nodes
+                    .iter()
+                    .map(|e| MTNode {
                         siblings1: e.siblings1,
                         siblings2: e.siblings2,
                         is_left_child: e.is_left_child,
                         is_right_child: e.is_right_child,
-                    }
-                }).collect()
+                    })
+                    .collect(),
             },
             root: proof.root,
             root_version: proof.root_version,
-            uid: proof.uid
+            uid: proof.uid,
         }
     }
 
@@ -492,7 +494,10 @@ mod tests {
     }
 
     // outputs &mut merkle tree (wrap it in an option merkle tree, not req)
-    fn build_new_merkle_tree(n: i32,  mt: &mut PersistentMerkleTree<TempRocksDB>) -> Result<()> {
+    fn build_new_merkle_tree(
+        n: i32,
+        mt: &mut PersistentMerkleTree<TempRocksDB>,
+    ) -> Result<()> {
         // add 6/7 abar and populate and then retrieve values
 
         let mut prng = ChaChaRng::from_seed([0u8; 32]);
@@ -527,11 +532,7 @@ mod tests {
 
         let path = thread::current().name().unwrap().to_owned();
         let fdb = TempRocksDB::open(path).expect("failed to open db");
-        let cs = Arc::new(RwLock::new(ChainState::new(
-            fdb,
-            "test_db".to_string(),
-            0,
-        )));
+        let cs = Arc::new(RwLock::new(ChainState::new(fdb, "test_db".to_string(), 0)));
         let mut state = State::new(cs, false);
         let store = PrefixedStore::new("my_store", &mut state);
 
@@ -558,7 +559,9 @@ mod tests {
         build_new_merkle_tree(5, &mut mt).unwrap();
 
         let abar = AnonBlindAssetRecord::from_oabar(&oabar);
-        let uid = mt.add_commitment_hash(hash_abar(mt.entry_count(), &abar)).unwrap();
+        let uid = mt
+            .add_commitment_hash(hash_abar(mt.entry_count(), &abar))
+            .unwrap();
         let _ = mt.commit();
         let mt_proof = mt.generate_proof(uid).unwrap();
         assert_eq!(mt.get_current_root_hash().unwrap(), mt_proof.root);
@@ -669,7 +672,11 @@ mod tests {
         {
             // verifier scope
             let verifier_params = NodeParams::from(user_params);
-            let t = verify_anon_xfr_body(&verifier_params, &body, &mt.get_current_root_hash().unwrap());
+            let t = verify_anon_xfr_body(
+                &verifier_params,
+                &body,
+                &mt.get_current_root_hash().unwrap(),
+            );
             println!("{:?}", t);
             assert!(t.is_ok());
 

@@ -166,7 +166,7 @@ impl UserParams {
             )),
         };
 
-        max_degree_poly_com.next_power_of_two();
+        //max_degree_poly_com.next_power_of_two();
 
         let pcs = KZGCommitmentScheme::new(
             max_degree_poly_com + 2,

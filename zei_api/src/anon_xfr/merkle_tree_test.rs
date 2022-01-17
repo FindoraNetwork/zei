@@ -1,12 +1,15 @@
-
 #[cfg(test)]
 mod tests {
     use crate::anon_xfr::circuits::{
         add_merkle_path_variables, compute_merkle_root, AccElemVars,
     };
     use crate::anon_xfr::keys::AXfrKeyPair;
-    use accumulators::merkle_tree::{generate_path_keys, Path, PersistentMerkleTree, BASE_KEY, get_path_from_uid};
-    use crate::anon_xfr::structs::{AnonBlindAssetRecord, MTNode, MTPath, OpenAnonBlindAssetRecord};
+    use crate::anon_xfr::structs::{
+        AnonBlindAssetRecord, MTNode, MTPath, OpenAnonBlindAssetRecord,
+    };
+    use accumulators::merkle_tree::{
+        generate_path_keys, get_path_from_uid, Path, PersistentMerkleTree, BASE_KEY,
+    };
     use algebra::bls12_381::BLSScalar;
     use algebra::groups::{Scalar, Zero};
     use crypto::basics::hash::rescue::RescueInstance;
@@ -20,14 +23,19 @@ mod tests {
     use std::thread;
     use storage::db::{RocksDB, TempRocksDB};
     use storage::state::{ChainState, State};
-    use storage::store::{PrefixedStore};
+    use storage::store::PrefixedStore;
 
     #[test]
     pub fn test_generate_path_keys() {
         let keys = generate_path_keys(vec![Path::Right, Path::Left, Path::Middle]);
         assert_eq!(
             keys,
-            vec!["dense_merkle_tree:root:", "dense_merkle_tree:root:r", "dense_merkle_tree:root:rl", "dense_merkle_tree:root:rlm"]
+            vec![
+                "dense_merkle_tree:root:",
+                "dense_merkle_tree:root:r",
+                "dense_merkle_tree:root:rl",
+                "dense_merkle_tree:root:rlm"
+            ]
         );
     }
 
@@ -303,7 +311,9 @@ mod tests {
 
         let abar =
             AnonBlindAssetRecord::from_oabar(&OpenAnonBlindAssetRecord::default());
-        assert!(mt.add_commitment_hash(hash_abar(mt.entry_count(), &abar)).is_ok());
+        assert!(mt
+            .add_commitment_hash(hash_abar(mt.entry_count(), &abar))
+            .is_ok());
 
         assert_ne!(
             mt.get_current_root_hash().unwrap(),
@@ -324,7 +334,9 @@ mod tests {
             // println!("{}       {} {:#?}", t, key, res.unwrap().unwrap());
         }
 
-        assert!(mt.add_commitment_hash(hash_abar(mt.entry_count(), &abar)).is_ok());
+        assert!(mt
+            .add_commitment_hash(hash_abar(mt.entry_count(), &abar))
+            .is_ok());
         let key2 = "dense_merkle_tree:root:llllllllllllllllllllllllllllllllllllllllm";
         let mut res = mt.get(key2.as_bytes());
         assert!(res.is_ok());
@@ -335,7 +347,9 @@ mod tests {
         assert!(res.is_ok());
         assert!(res.unwrap().is_none());
 
-        assert!(mt.add_commitment_hash(hash_abar(mt.entry_count(), &abar)).is_ok());
+        assert!(mt
+            .add_commitment_hash(hash_abar(mt.entry_count(), &abar))
+            .is_ok());
         res = mt.get(key3.as_bytes());
         assert!(res.is_ok());
         assert!(res.unwrap().is_some());
@@ -365,7 +379,9 @@ mod tests {
             amount_type_commitment: BLSScalar::random(&mut prng),
             public_key: key_pair.pub_key(),
         };
-        assert!(mt.add_commitment_hash(hash_abar(mt.entry_count(), &abar)).is_ok());
+        assert!(mt
+            .add_commitment_hash(hash_abar(mt.entry_count(), &abar))
+            .is_ok());
 
         let proof = mt.generate_proof(0).unwrap();
 
@@ -383,17 +399,21 @@ mod tests {
             pub_key_y: pk_var.get_y(),
         };
 
-        let path_vars = add_merkle_path_variables(&mut cs,
-                                                  MTPath{
-                                                      nodes: proof.nodes.iter().map(|e| {
-                                                          MTNode{
-                                                              siblings1: e.siblings1,
-                                                              siblings2: e.siblings2,
-                                                              is_left_child: e.is_left_child,
-                                                              is_right_child: e.is_right_child,
-                                                          }
-                                                      }).collect()
-                                                  });
+        let path_vars = add_merkle_path_variables(
+            &mut cs,
+            MTPath {
+                nodes: proof
+                    .nodes
+                    .iter()
+                    .map(|e| MTNode {
+                        siblings1: e.siblings1,
+                        siblings2: e.siblings2,
+                        is_left_child: e.is_left_child,
+                        is_right_child: e.is_right_child,
+                    })
+                    .collect(),
+            },
+        );
         let root_var = compute_merkle_root(&mut cs, elem, &path_vars);
 
         // Check Merkle root correctness
@@ -454,7 +474,9 @@ mod tests {
             amount_type_commitment: BLSScalar::random(&mut prng),
             public_key: key_pair.pub_key(),
         };
-        assert!(mt.add_commitment_hash(hash_abar(mt.entry_count(), &abar)).is_ok());
+        assert!(mt
+            .add_commitment_hash(hash_abar(mt.entry_count(), &abar))
+            .is_ok());
         mt.commit()?;
 
         key_pair = AXfrKeyPair::generate(&mut prng);
@@ -462,7 +484,9 @@ mod tests {
             amount_type_commitment: BLSScalar::random(&mut prng),
             public_key: key_pair.pub_key(),
         };
-        assert!(mt.add_commitment_hash(hash_abar(mt.entry_count(), &abar)).is_ok());
+        assert!(mt
+            .add_commitment_hash(hash_abar(mt.entry_count(), &abar))
+            .is_ok());
         mt.commit()?;
 
         key_pair = AXfrKeyPair::generate(&mut prng);
@@ -470,7 +494,9 @@ mod tests {
             amount_type_commitment: BLSScalar::random(&mut prng),
             public_key: key_pair.pub_key(),
         };
-        assert!(mt.add_commitment_hash(hash_abar(mt.entry_count(), &abar)).is_ok());
+        assert!(mt
+            .add_commitment_hash(hash_abar(mt.entry_count(), &abar))
+            .is_ok());
         mt.commit()?;
 
         key_pair = AXfrKeyPair::generate(&mut prng);
@@ -478,7 +504,9 @@ mod tests {
             amount_type_commitment: BLSScalar::random(&mut prng),
             public_key: key_pair.pub_key(),
         };
-        assert!(mt.add_commitment_hash(hash_abar(mt.entry_count(), &abar)).is_ok());
+        assert!(mt
+            .add_commitment_hash(hash_abar(mt.entry_count(), &abar))
+            .is_ok());
         mt.commit()?;
 
         Ok(())
@@ -493,7 +521,6 @@ mod tests {
 
         let store = PrefixedStore::new("mystore", &mut state);
         let mut pmt = PersistentMerkleTree::new(store).unwrap();
-
 
         let mut prng = ChaChaRng::from_seed([0u8; 32]);
         let key_pair: AXfrKeyPair = AXfrKeyPair::generate(&mut prng);
@@ -510,21 +537,32 @@ mod tests {
             public_key: key_pair.pub_key(),
         };
 
-        pmt.add_commitment_hash(hash_abar(pmt.entry_count(), &abar0)).unwrap();
-        pmt.add_commitment_hash(hash_abar(pmt.entry_count(), &abar1)).unwrap();
-        pmt.add_commitment_hash(hash_abar(pmt.entry_count(), &abar2)).unwrap();
-        pmt.add_commitment_hash(hash_abar(pmt.entry_count(), &abar0)).unwrap();
-        pmt.add_commitment_hash(hash_abar(pmt.entry_count(), &abar1)).unwrap();
-        pmt.add_commitment_hash(hash_abar(pmt.entry_count(), &abar2)).unwrap();
-        pmt.add_commitment_hash(hash_abar(pmt.entry_count(), &abar0)).unwrap();
-        pmt.add_commitment_hash(hash_abar(pmt.entry_count(), &abar1)).unwrap();
-        pmt.add_commitment_hash(hash_abar(pmt.entry_count(), &abar2)).unwrap();
-        pmt.add_commitment_hash(hash_abar(pmt.entry_count(), &abar0)).unwrap();
-        pmt.add_commitment_hash(hash_abar(pmt.entry_count(), &abar1)).unwrap();
-        pmt.add_commitment_hash(hash_abar(pmt.entry_count(), &abar2)).unwrap();
+        pmt.add_commitment_hash(hash_abar(pmt.entry_count(), &abar0))
+            .unwrap();
+        pmt.add_commitment_hash(hash_abar(pmt.entry_count(), &abar1))
+            .unwrap();
+        pmt.add_commitment_hash(hash_abar(pmt.entry_count(), &abar2))
+            .unwrap();
+        pmt.add_commitment_hash(hash_abar(pmt.entry_count(), &abar0))
+            .unwrap();
+        pmt.add_commitment_hash(hash_abar(pmt.entry_count(), &abar1))
+            .unwrap();
+        pmt.add_commitment_hash(hash_abar(pmt.entry_count(), &abar2))
+            .unwrap();
+        pmt.add_commitment_hash(hash_abar(pmt.entry_count(), &abar0))
+            .unwrap();
+        pmt.add_commitment_hash(hash_abar(pmt.entry_count(), &abar1))
+            .unwrap();
+        pmt.add_commitment_hash(hash_abar(pmt.entry_count(), &abar2))
+            .unwrap();
+        pmt.add_commitment_hash(hash_abar(pmt.entry_count(), &abar0))
+            .unwrap();
+        pmt.add_commitment_hash(hash_abar(pmt.entry_count(), &abar1))
+            .unwrap();
+        pmt.add_commitment_hash(hash_abar(pmt.entry_count(), &abar2))
+            .unwrap();
         pmt.commit().unwrap();
     }
-
 
     fn hash_abar(uid: u64, abar: &AnonBlindAssetRecord) -> BLSScalar {
         let hash = RescueInstance::new();

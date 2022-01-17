@@ -219,7 +219,7 @@ impl<'a, D: MerkleDB> PersistentMerkleTree<'a, D> {
             })
             .collect::<Result<Vec<ProofNode>>>()?;
 
-        Ok(Proof{
+        Ok(Proof {
             nodes: nodes,
             root: self.get_current_root_hash().unwrap(),
             root_version: 1,
