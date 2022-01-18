@@ -58,6 +58,7 @@ impl AXfrNote {
         let mut index = 0;
         for keypair in keypairs {
             println!("generate_note_from_body Public Key: {}", base64::encode(&body.inputs[index].1.zei_to_bytes()));
+            println!("generate_note_from_body Public Key: {}", base64::encode(&keypair.pub_key().zei_to_bytes()));
             let signature = keypair.sign(msg.as_slice());
             body.inputs[index].1.verify(msg.as_slice(), &signature.clone()).unwrap();
             signatures.push(signature);
