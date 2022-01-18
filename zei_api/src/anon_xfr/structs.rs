@@ -15,6 +15,8 @@ use ruc::*;
 use serde::Serialize;
 use utils::errors::ZeiError;
 use wasm_bindgen::prelude::*;
+use utils::serialization::ZeiFromToBytes;
+use base64;
 
 pub type Nullifier = BLSScalar;
 pub type Commitment = BLSScalar;
@@ -55,6 +57,7 @@ impl AXfrNote {
 
         let mut index = 0;
         for keypair in keypairs {
+            println!("generate_note_from_body Public Key: {}", base64::encode(&body.inputs[index].1.zei_to_bytes()));
             let signature = keypair.sign(msg.as_slice());
             body.inputs[index].1.verify(msg.as_slice(), &signature.clone()).unwrap();
             signatures.push(signature);
@@ -73,7 +76,11 @@ impl AXfrNote {
             .inputs
             .iter()
             .zip(self.signatures.iter())
-            .map(|(inp, sig)| inp.1.verify(msg.as_slice(), sig))
+            .map(|(inp, sig)| {
+
+                println!("generate_note_from_body Public Key: {}", base64::encode(&inp.1.zei_to_bytes()));
+                inp.1.verify(msg.as_slice(), sig)
+            })
             .collect::<Result<Vec<()>>>()
             .c(d!("AXfrNote signature verification failed"))?;
 
