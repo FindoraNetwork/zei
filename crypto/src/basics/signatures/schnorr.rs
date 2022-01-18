@@ -317,6 +317,9 @@ fn verify<G: Group>(
     let left = sig.R.add(&pk.0.mul(&c));
     let right = g.mul(&sig.s);
 
+    println!("schnorr verify: {:?}", left.clone());
+    println!("schnorr verify: {:?}", right.clone());
+
     if left == right {
         Ok(())
     } else {
