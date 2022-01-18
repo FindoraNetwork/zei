@@ -54,7 +54,9 @@ impl AXfrNote {
             .c(d!())?;
 
         for keypair in keypairs {
-            signatures.push(keypair.sign(msg.as_slice()))
+            let signature = keypair.sign(msg.as_slice());
+            keypair.pub_key().verify(msg.as_slice(), &signature.clone()).unwrap();
+            signatures.push(signature);
         }
         println!("generate_note_from_body {:?}", signatures);
 
