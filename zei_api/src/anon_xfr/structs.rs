@@ -53,13 +53,13 @@ impl AXfrNote {
             .map_err(|_| ZeiError::SerializationError)
             .c(d!())?;
 
+        let mut index = 0;
         for keypair in keypairs {
             let signature = keypair.sign(msg.as_slice());
-            keypair.pub_key().verify(msg.as_slice(), &signature.clone()).unwrap();
+            body.inputs[index].1.verify(msg.as_slice(), &signature.clone()).unwrap();
             signatures.push(signature);
+            index+=1;
         }
-        println!("generate_note_from_body {:?}", signatures);
-
 
         Ok(AXfrNote { body, signatures })
     }
@@ -68,8 +68,6 @@ impl AXfrNote {
         let msg: Vec<u8> = bincode::serialize(&self.body)
             .map_err(|_| ZeiError::SerializationError)
             .c(d!())?;
-
-        println!("verify {:?}", self.signatures);
 
         self.body
             .inputs
