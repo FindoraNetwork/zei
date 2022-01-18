@@ -323,6 +323,7 @@ fn verify<G: Group>(
     if left == right {
         Ok(())
     } else {
+        println!("ZeiError::SignatureError");
         Err(eg!(ZeiError::SignatureError))
     }
 }

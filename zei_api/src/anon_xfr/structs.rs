@@ -60,6 +60,8 @@ impl AXfrNote {
             println!("generate_note_from_body Public Key: {}", base64::encode(&body.inputs[index].1.zei_to_bytes()));
             println!("generate_note_from_body Public Key: {}", base64::encode(&keypair.pub_key().zei_to_bytes()));
             let signature = keypair.sign(msg.as_slice());
+
+            println!("Calling verify from generate_note_from_body");
             body.inputs[index].1.verify(msg.as_slice(), &signature.clone()).unwrap();
             signatures.push(signature);
             index+=1;
@@ -79,7 +81,7 @@ impl AXfrNote {
             .zip(self.signatures.iter())
             .map(|(inp, sig)| {
 
-                println!("generate_note_from_body Public Key: {}", base64::encode(&inp.1.zei_to_bytes()));
+                println!("verify Public Key: {}", base64::encode(&inp.1.zei_to_bytes()));
                 inp.1.verify(msg.as_slice(), sig)
             })
             .collect::<Result<Vec<()>>>()
