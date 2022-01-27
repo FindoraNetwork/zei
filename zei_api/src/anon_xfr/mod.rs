@@ -48,7 +48,7 @@ pub fn gen_anon_xfr_body<R: CryptoRng + RngCore>(
         return Err(eg!(ZeiError::AXfrProverParamsError));
     }
     check_inputs(inputs, input_keypairs).c(d!())?;
-    check_asset_amount(inputs, outputs).c(d!())?;
+    check_asset_amount_with_fees(inputs, outputs).c(d!())?;
     check_roots(inputs).c(d!())?;
 
     // 2. randomize input key pair with open_abar rand key
@@ -179,6 +179,49 @@ fn check_inputs(
     }
     Ok(())
 }
+#[allow(dead_code)]
+/// Check that for each asset type total input amount == total output amount
+/// and for FRA, total input amount == total output amount + fees for fra
+fn check_asset_amount_with_fees(
+    inputs: &[OpenAnonBlindAssetRecord],
+    outputs: &[OpenAnonBlindAssetRecord],
+) -> Result<()> {
+    let fee_asset_type = AssetType::from_identical_byte(0);
+    let mut balances = HashMap::new();
+
+    for record in inputs.iter() {
+        if let Some(x) = balances.get_mut(&record.asset_type) {
+            *x += record.amount as i128;
+        } else {
+            balances.insert(record.asset_type, record.amount as i128);
+        }
+    }
+
+    for record in outputs.iter() {
+        if let Some(x) = balances.get_mut(&record.asset_type) {
+            *x -= record.amount as i128;
+        } else {
+            balances.insert(record.asset_type, -(record.amount as i128));
+        }
+    }
+
+    let fee_amount = (5 + inputs.len() + outputs.len() * 2) as i128;
+
+    for (&asset_type, &sum) in balances.iter() {
+        if asset_type != fee_asset_type {
+            if sum != 0i128 {
+                return Err(eg!(ZeiError::XfrCreationAssetAmountError));
+            }
+        } else {
+            if sum != fee_amount {
+                return Err(eg!(ZeiError::XfrCreationAssetAmountError));
+            }
+        }
+    }
+
+    Ok(())
+}
+#[allow(dead_code)]
 /// Check that for each asset type total input amount == total output amount
 fn check_asset_amount(
     inputs: &[OpenAnonBlindAssetRecord],
