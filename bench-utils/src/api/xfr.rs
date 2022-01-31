@@ -7,7 +7,7 @@ use rand_chacha::ChaChaRng;
 use criterion::{BenchmarkGroup, Criterion};
 
 use zei::api::anon_creds::{ACCommitmentKey, ACUserSecretKey, Credential};
-use zei::setup::PublicParams;
+use zei::setup::{PublicParams, DEFAULT_BP_NUM_GENS};
 use zei::xfr::lib::{
     batch_verify_xfr_notes, gen_xfr_body, gen_xfr_note, verify_xfr_body,
     verify_xfr_note, XfrNotePolicies, XfrNotePoliciesRef,
@@ -29,13 +29,13 @@ pub const XFR_NOTE_SIZES: [usize; 3] = [1, 4, 16];
 
 fn run_verify_xfr_note(xfr_note: &XfrNote, policies: &XfrNotePoliciesRef) {
     let mut prng = ChaChaRng::from_seed([0u8; 32]);
-    let mut params = PublicParams::new();
+    let mut params = PublicParams::new(DEFAULT_BP_NUM_GENS);
     assert!(verify_xfr_note(&mut prng, &mut params, xfr_note, policies).is_ok());
 }
 
 fn run_verify_xfr_body(xfr_body: &XfrBody, policies: &XfrNotePoliciesRef) {
     let mut prng = ChaChaRng::from_seed([0u8; 32]);
-    let mut params = PublicParams::new();
+    let mut params = PublicParams::new(DEFAULT_BP_NUM_GENS);
     assert!(verify_xfr_body(&mut prng, &mut params, xfr_body, policies).is_ok());
 }
 

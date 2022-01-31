@@ -58,6 +58,8 @@ jobs:
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
       - name: Test
+        env:
+          RUSTFLAGS: -C target-cpu=native
         uses: actions-rs/cargo@v1
         with:
             command: test

@@ -19,6 +19,7 @@ enum Actions {
         n_payers: usize,
         n_payees: usize,
         tree_depth: usize,
+        bp_num_gens: usize,
         out_filename: PathBuf,
     },
 
@@ -47,9 +48,10 @@ fn main() {
             n_payers,
             n_payees,
             tree_depth,
+            bp_num_gens,
             out_filename,
         } => {
-            gen_user_params(n_payers, n_payees, tree_depth, out_filename);
+            gen_user_params(n_payers, n_payees, tree_depth, bp_num_gens, out_filename);
         }
         BP {
             gens_capacity,
@@ -70,6 +72,7 @@ fn gen_user_params(
     n_payers: usize,
     n_payees: usize,
     tree_depth: usize,
+    bp_num_gens: usize,
     out_filename: PathBuf,
 ) {
     println!(
@@ -83,7 +86,7 @@ fn gen_user_params(
         Some(tree_depth)
     };
 
-    let user_params = UserParams::new(n_payers, n_payees, tree_dept_option);
+    let user_params = UserParams::new(n_payers, n_payees, tree_dept_option, bp_num_gens);
     let user_params_ser = bincode::serialize(&user_params).unwrap();
     save_to_file(&user_params_ser, out_filename);
 }

@@ -364,7 +364,7 @@ mod tests {
     }
 
     #[test]
-    fn test_persistent_merkle_tree_proof_commitment() {
+    fn test_persistant_merkle_tree_proof_commitment() {
         let path = thread::current().name().unwrap().to_owned();
         let fdb = TempRocksDB::open(path).expect("failed to open db");
         let cs = Arc::new(RwLock::new(ChainState::new(fdb, "test_db".to_string(), 0)));

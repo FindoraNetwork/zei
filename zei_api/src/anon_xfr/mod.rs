@@ -28,7 +28,6 @@ pub(crate) mod circuits;
 pub mod config;
 pub mod keys;
 mod merkle_tree_test;
-pub mod parameters;
 pub(crate) mod proofs;
 pub mod structs;
 
@@ -357,7 +356,7 @@ mod tests {
 
     use crate::anon_xfr::config::{FEE_CALCULATING_FUNC, FEE_TYPE};
     use crate::anon_xfr::structs::AXfrNote;
-    use crate::setup::{NodeParams, UserParams};
+    use crate::setup::{NodeParams, UserParams, DEFAULT_BP_NUM_GENS};
     use crypto::basics::hash::rescue::RescueInstance;
     use storage::db::TempRocksDB;
     use storage::state::{ChainState, State};
@@ -388,7 +387,9 @@ mod tests {
     fn test_anon_xfr() {
         let mut prng = ChaChaRng::from_seed([0u8; 32]);
 
-        let user_params = UserParams::new(1, 1, Some(1));
+        let user_params =
+            UserParams::from_file_if_exists(1, 1, Some(1), DEFAULT_BP_NUM_GENS, None)
+                .unwrap();
 
         let zero = BLSScalar::zero();
         let one = BLSScalar::one();
@@ -552,7 +553,9 @@ mod tests {
         let mut state = State::new(cs, false);
         let store = PrefixedStore::new("my_store", &mut state);
 
-        let user_params = UserParams::new(1, 1, Some(41));
+        let user_params =
+            UserParams::from_file_if_exists(1, 1, Some(41), DEFAULT_BP_NUM_GENS, None)
+                .unwrap();
 
         let fee_amount = FEE_CALCULATING_FUNC(1, 1) as u64;
         let output_amount = 10u64;
@@ -704,7 +707,14 @@ mod tests {
         let mut prng = ChaChaRng::from_seed([0u8; 32]);
         let n_payers = 3;
         let n_payees = 3;
-        let user_params = UserParams::new(n_payers, n_payees, Some(1));
+        let user_params = UserParams::from_file_if_exists(
+            n_payers,
+            n_payees,
+            Some(1),
+            DEFAULT_BP_NUM_GENS,
+            None,
+        )
+        .unwrap();
 
         let zero = BLSScalar::zero();
         let one = BLSScalar::one();

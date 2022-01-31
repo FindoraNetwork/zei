@@ -167,7 +167,7 @@ mod tests {
     use crate::anon_xfr::circuits::AMultiXfrPubInputs;
     use crate::anon_xfr::config::{FEE_CALCULATING_FUNC, FEE_TYPE};
     use crate::anon_xfr::proofs::{prove_xfr, verify_xfr};
-    use crate::setup::{NodeParams, UserParams};
+    use crate::setup::{NodeParams, UserParams, DEFAULT_BP_NUM_GENS};
     use algebra::bls12_381::BLSScalar;
     use algebra::groups::One;
     use rand::RngCore;
@@ -332,7 +332,14 @@ mod tests {
         let secret_inputs =
             new_multi_xfr_witness_for_test(inputs.to_vec(), outputs.to_vec(), [0u8; 32]);
         let pub_inputs = AMultiXfrPubInputs::from_witness(&secret_inputs);
-        let params = UserParams::new(n_payers, n_payees, Some(1));
+        let params = UserParams::from_file_if_exists(
+            n_payers,
+            n_payees,
+            Some(1),
+            DEFAULT_BP_NUM_GENS,
+            None,
+        )
+        .unwrap();
         let mut prng = ChaChaRng::from_seed([0u8; 32]);
         let proof = prove_xfr(&mut prng, &params, secret_inputs).unwrap();
 

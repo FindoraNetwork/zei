@@ -170,14 +170,14 @@ pub(crate) fn bar_to_abar<R: CryptoRng + RngCore>(
         BLSScalar::zero(),
     ])[0];
 
-    // 3. compute the ZK part of the proof
+    // 2. compute the ZK part of the proof
     let (commitment_eq_proof, non_zk_state, beta) =
         prove_pc_eq_rescue_split_verifier_zk_part(
             prng, &x, &gamma, &y, &delta, &pc_gens, &point_p, &point_q, &z,
         )
         .c(d!())?;
 
-    // 4. prove abar correctness
+    // 3. prove abar correctness
     let pc_rescue_commitments_eq_proof = prove_eq_committed_vals(
         prng,
         params,
