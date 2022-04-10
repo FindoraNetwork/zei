@@ -1,7 +1,5 @@
 #[cfg(test)]
 mod tests {
-    use super::*;
-
     use crate::anon_xfr::circuits::{
         add_merkle_path_variables, compute_merkle_root, AccElemVars,
     };

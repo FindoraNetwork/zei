@@ -156,6 +156,10 @@ pub fn preprocess_prover<
     let k = choose_ks::<_, PCS::Field>(&mut prng, n_wires_per_gate);
     let coset_quot = group_m.iter().map(|x| k[1].mul(x)).collect();
 
+    use std::time::Instant;
+
+    let timer = Instant::now();
+
     // Compute the openings, commitments, and point evaluations of the permutation polynomials.
     let perm = cs.compute_permutation();
     let mut p_values = Vec::with_capacity(n_wires_per_gate * n);
@@ -173,35 +177,53 @@ pub fn preprocess_prover<
         verifier_extended_perms.push(C_perm);
     }
 
+    println!("perms: {}", timer.elapsed().as_secs_f64());
+
+    let timer = Instant::now();
     // Compute the openings, commitments, and point evaluations of the selector polynomials.
     let mut selectors_coset_evals = vec![vec![]; cs.num_selectors()];
     let mut prover_selectors = vec![];
     let mut verifier_selectors = vec![];
     for (i, selector_coset_evals) in selectors_coset_evals.iter_mut().enumerate() {
         let q = FpPolynomial::ffti(&root, cs.selector(i)?);
+        let timer = Instant::now();
         selector_coset_evals.extend(q.coset_fft_with_unity_root(&root_m, m, &k[1]));
+        println!("coset_fft_with_unity_root: {}", timer.elapsed().as_secs_f64());
+        let timer = Instant::now();
         let (C_q, O_q) = pcs.commit(q).c(d!(PlonkError::SetupError))?;
+        println!("msm: {}", timer.elapsed().as_secs_f64());
         prover_selectors.push(O_q);
         verifier_selectors.push(C_q);
     }
+    println!("selectors: {}", timer.elapsed().as_secs_f64());
 
     // Compute polynomials L1, Z_H, and point evaluations of L1 and Z_H^{-1}.
+
+    let timer = Instant::now();
     let L1 = FpPolynomial::from_zeroes(&group[1..]);
+    println!("L1 from_zeroes: {}", timer.elapsed().as_secs_f64());
+    let timer = Instant::now();
     let L1_coset_evals = L1.coset_fft_with_unity_root(&root_m, m, &k[1]);
+    println!("L1_coset_evals: {}", timer.elapsed().as_secs_f64());
+
     let mut Z_H_coefs = vec![PCS::Field::zero(); n + 1];
     Z_H_coefs[0] = PCS::Field::one().neg();
     Z_H_coefs[n] = PCS::Field::one();
     let Z_H = FpPolynomial::from_coefs(Z_H_coefs);
+    let timer = Instant::now();
     let Z_H_inv_coset_evals = Z_H
         .coset_fft_with_unity_root(&root_m, m, &k[1])
         .into_iter()
         .map(|x| x.inv().unwrap())
         .collect();
+    println!("Z_H: {}", timer.elapsed().as_secs_f64());
 
+    let timer = Instant::now();
     let mut lagrange_constants = vec![];
     for constraint_index in cs.public_vars_constraint_indices().iter() {
         lagrange_constants.push(compute_lagrange_constant(&group, *constraint_index));
     }
+    println!("L: {}", timer.elapsed().as_secs_f64());
 
     let verifier_params = PlonkVerifierParams {
         selectors: verifier_selectors,

@@ -170,12 +170,20 @@ impl UserParams {
             blind: bls_zero,
         };
 
+        use std::time::Instant;
+
+
         let (cs, _) = build_abar_to_bar_cs(payer_secret, &proof, &non_zk_state, &beta);
         let srs = SRS.c(d!(ZeiError::MissingSRSError))?;
+
+        let timer = Instant::now();
         let pcs: KZGCommitmentSchemeBLS =
             bincode::deserialize(&srs).c(d!(ZeiError::DeserializationError))?;
+        println!("pcs: {}", timer.elapsed().as_secs_f64());
 
+        let timer = Instant::now();
         let prover_params = preprocess_prover(&cs, &pcs, COMMON_SEED)?;
+        println!("preprocess_prover: {}", timer.elapsed().as_secs_f64());
         Ok(UserParams {
             bp_params: PublicParams::new(),
             pcs,
@@ -211,11 +219,17 @@ impl UserParams {
         let (cs, _) =
             build_anon_fee_cs(payer_secret, payee_secret, FEE_TYPE.as_scalar());
 
+        use std::time::Instant;
         let srs = SRS.c(d!(ZeiError::MissingSRSError))?;
+
+        let timer = Instant::now();
         let pcs: KZGCommitmentSchemeBLS =
             bincode::deserialize(&srs).c(d!(ZeiError::DeserializationError))?;
+        println!("pcs: {}", timer.elapsed().as_secs_f64());
 
+        let timer = Instant::now();
         let prover_params = preprocess_prover(&cs, &pcs, COMMON_SEED).unwrap();
+        println!("preprocess_prover: {}", timer.elapsed().as_secs_f64());
         Ok(UserParams {
             bp_params: PublicParams::new(),
             pcs,

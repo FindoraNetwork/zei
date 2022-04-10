@@ -117,6 +117,9 @@ pub fn prover<
     let n_wires_per_gate = CS::n_wires_per_gate();
     let mut witness_openings = vec![];
     let mut C_witness_polys = vec![];
+
+    use std::time::Instant;
+    let timer = Instant::now();
     for i in 0..n_wires_per_gate {
         let mut f = FpPolynomial::ffti(
             root,
@@ -128,6 +131,7 @@ pub fn prover<
         witness_openings.push(O_f);
         C_witness_polys.push(C_f);
     }
+    println!("wires: {}", timer.elapsed().as_secs_f64());
 
     // 2. get challenges gamma and delta
     let gamma = transcript_get_plonk_challenge_gamma(transcript, n_constraints);
@@ -135,11 +139,13 @@ pub fn prover<
     challenges.insert_gamma_delta(gamma, delta).unwrap(); // safe unwrap
 
     // 3. build sigma, hide it and commit
+    let timer = Instant::now();
     let mut Sigma =
         sigma_polynomial::<PCS, CS>(cs, params, &extended_witness, &challenges);
     hide_polynomial(prng, &mut Sigma, 2, n_constraints);
     let (C_Sigma, O_Sigma) = pcs.commit(Sigma).c(d!(PlonkError::CommitmentError))?;
     transcript.append_commitment::<PCS::Commitment>(&C_Sigma);
+    println!("sigma: {}", timer.elapsed().as_secs_f64());
 
     // 4. get challenge alpha
     let alpha = transcript_get_plonk_challenge_alpha(transcript, n_constraints);
@@ -152,6 +158,7 @@ pub fn prover<
         .map(|open| pcs.polynomial_from_opening_ref(open))
         .collect();
     let Sigma = pcs.polynomial_from_opening_ref(&O_Sigma);
+    let timer = Instant::now();
     let Q = quotient_polynomial::<PCS, CS>(
         cs,
         params,
@@ -161,11 +168,15 @@ pub fn prover<
         &IO,
     )
     .c(d!())?;
+    println!("q: {}", timer.elapsed().as_secs_f64());
+
+    let timer = Instant::now();
     let (C_q_polys, O_q_polys) =
         split_q_and_commit(pcs, &Q, n_wires_per_gate, n_constraints + 2).c(d!())?;
     for C_q in C_q_polys.iter() {
         transcript.append_commitment::<PCS::Commitment>(C_q);
     }
+    println!("q_comm: {}", timer.elapsed().as_secs_f64());
 
     // 6. get challenge beta
     let beta = transcript_get_plonk_challenge_beta(transcript, n_constraints);
