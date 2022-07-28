@@ -645,7 +645,7 @@ mod test {
         let six = five.add(&one);
         let seven = six.add(&one);
 
-        let witness = [one, three, five, four, two, two, seven, six, three];
+        let witness = [one, three, five, four, two, two, seven, six];
         cs.add_variables(&witness);
 
         cs.insert_add_gate(0 + 2, 4 + 2, 1 + 2);

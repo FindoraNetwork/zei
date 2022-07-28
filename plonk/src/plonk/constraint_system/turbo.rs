@@ -6,6 +6,9 @@ use super::{ConstraintSystem, CsIndex, VarIndex};
 use crate::plonk::errors::PlonkError;
 use zei_algebra::prelude::*;
 
+#[cfg(all(feature = "debug", nightly))]
+use std::collections::HashMap;
+
 /// The wires number of a gate in Turbo CS.
 pub const N_WIRES_PER_GATE: usize = 5;
 
@@ -33,6 +36,10 @@ pub struct TurboCS<F> {
     pub verifier_only: bool,
     /// A private witness for the circuit, cleared after computing a proof.
     pub witness: Vec<F>,
+    /// record witness backtracking info for checking dangleing witness
+    #[cfg(all(feature = "debug", nightly))]
+    #[serde(skip)]
+    pub witness_backtrace: HashMap<VarIndex, std::backtrace::Backtrace>,
 }
 
 impl<F: Scalar> ConstraintSystem for TurboCS<F> {
@@ -164,6 +171,9 @@ impl<F: Scalar> ConstraintSystem for TurboCS<F> {
             boolean_constraint_indices: vec![],
             verifier_only: true,
             witness: vec![],
+
+            #[cfg(all(feature = "debug", nightly))]
+            witness_backtrace: HashMap::new(),
         })
     }
 }
@@ -208,6 +218,9 @@ impl<F: Scalar> TurboCS<F> {
             boolean_constraint_indices: vec![],
             verifier_only: false,
             witness: vec![F::zero(), F::one()],
+
+            #[cfg(all(feature = "debug", nightly))]
+            witness_backtrace: HashMap::new(),
         }
     }
 
@@ -296,6 +309,13 @@ impl<F: Scalar> TurboCS<F> {
     pub fn new_variable(&mut self, value: F) -> VarIndex {
         self.num_vars += 1;
         self.witness.push(value);
+
+        #[cfg(all(feature = "debug", nightly))]
+        {
+            self.witness_backtrace
+                .insert(self.num_vars - 1, std::backtrace::Backtrace::capture());
+        }
+
         self.num_vars - 1
     }
 
@@ -305,6 +325,14 @@ impl<F: Scalar> TurboCS<F> {
         for value in values.iter() {
             self.witness.push(*value);
         }
+
+        #[cfg(all(feature = "debug", nightly))]
+        {
+            for var in self.num_vars - values.len()..self.num_vars {
+                self.witness_backtrace
+                    .insert(var, std::backtrace::Backtrace::capture());
+            }
+        }
     }
 
     /// Check if the gate is satisfied.
@@ -313,11 +341,16 @@ impl<F: Scalar> TurboCS<F> {
         self.size += 1;
         // does not work for the gate created for input.
 
-        let wiring_0 = self.witness[self.wiring[0][self.size - 1]];
-        let wiring_1 = self.witness[self.wiring[1][self.size - 1]];
-        let wiring_2 = self.witness[self.wiring[2][self.size - 1]];
-        let wiring_3 = self.witness[self.wiring[3][self.size - 1]];
-        let wiring_4 = self.witness[self.wiring[4][self.size - 1]];
+        let wiring_0_var = self.wiring[0][self.size - 1];
+        let wiring_1_var = self.wiring[1][self.size - 1];
+        let wiring_2_var = self.wiring[2][self.size - 1];
+        let wiring_3_var = self.wiring[3][self.size - 1];
+        let wiring_4_var = self.wiring[4][self.size - 1];
+        let wiring_0 = self.witness[wiring_0_var];
+        let wiring_1 = self.witness[wiring_1_var];
+        let wiring_2 = self.witness[wiring_2_var];
+        let wiring_3 = self.witness[wiring_3_var];
+        let wiring_4 = self.witness[wiring_4_var];
 
         let selector_0 = self.selectors[0][self.size - 1];
         let selector_1 = self.selectors[1][self.size - 1];
@@ -365,7 +398,21 @@ impl<F: Scalar> TurboCS<F> {
             }
             println!("cs constraint not satisfied.");
         }
+
+        #[cfg(nightly)]
+        for var in [
+            wiring_0_var,
+            wiring_1_var,
+            wiring_2_var,
+            wiring_3_var,
+            wiring_4_var,
+        ]
+        .iter()
+        {
+            self.witness_backtrace.remove(var);
+        }
     }
+
     #[cfg(not(feature = "debug"))]
     #[inline]
     /// Increase the gate count without checking.
@@ -584,7 +631,19 @@ impl<F: Scalar> TurboCS<F> {
         for i in 0..N_WIRES_PER_GATE {
             self.wiring[i].push(var);
         }
+
+        #[cfg(all(feature = "debug", nightly))]
+        let backtrace = { self.witness_backtrace.remove(&var) };
+
         self.finish_new_gate();
+
+        #[cfg(all(feature = "debug", nightly))]
+        {
+            match backtrace {
+                Some(v) => self.witness_backtrace.insert(var, v),
+                None => None,
+            };
+        }
     }
 
     /// Add a constant constraint: wo = constant, for prepare_pi_variable.
@@ -625,6 +684,15 @@ impl<F: Scalar> TurboCS<F> {
             wire.extend(vec![0; diff]);
         }
         self.size += diff;
+
+        #[cfg(all(feature = "debug", nightly))]
+        {
+            if !self.witness_backtrace.is_empty() {
+                for (_, v) in &self.witness_backtrace {
+                    panic!("dangling wintness:\n{}", v);
+                }
+            }
+        }
     }
 
     /// Add a Add selectors.
@@ -824,8 +892,8 @@ mod test {
         cs.new_variable(one);
         cs.new_variable(two);
         cs.new_variable(three);
-        let add = cs.add(0, 2);
-        let sub = cs.sub(3, 1);
+        let add = cs.add(0 + 2, 2 + 2);
+        let sub = cs.sub(3 + 2, 1 + 2);
         cs.equal(add, sub);
 
         let witness = cs.get_and_clear_witness();
@@ -845,9 +913,9 @@ mod test {
         cs.new_variable(one);
         cs.new_variable(two);
         cs.new_variable(two);
-        let one_equals_two = cs.is_equal(0, 1);
+        let one_equals_two = cs.is_equal(0 + 2, 1 + 2);
         assert_eq!(cs.witness[one_equals_two], zero);
-        let two_equals_two = cs.is_equal(1, 2);
+        let two_equals_two = cs.is_equal(1 + 2, 2 + 2);
         assert_eq!(cs.witness[two_equals_two], one);
 
         let mut witness = cs.get_and_clear_witness();
@@ -1269,5 +1337,64 @@ mod test {
             &proof
         )
         .is_ok());
+    }
+
+    #[test]
+    #[cfg(all(feature = "debug", nightly))]
+    fn test_dangling_wintness_without_panic() {
+        let one = F::one();
+        let two = one.add(&one);
+        let three = one.add(&two);
+        let four = one.add(&three);
+        let five = one.add(&four);
+        let nine = four.add(&five);
+
+        let mut cs = TurboCS::new();
+        let index_0 = cs.new_variable(one);
+        let index_1 = cs.new_variable(two);
+        let index_2 = cs.new_variable(three);
+        let index_3 = cs.new_variable(four);
+        assert!(cs.witness_backtrace.len() == 4);
+
+        cs.insert_add_gate(index_0, index_1, index_2);
+        cs.insert_mul_gate(index_0, index_1, index_1);
+        cs.insert_mul_gate(index_0, index_2, index_2);
+        assert!(cs.witness_backtrace.len() == 1);
+
+        cs.add_variables(&[five, nine]);
+        assert!(cs.witness_backtrace.len() == 3);
+        assert!(cs.witness_backtrace.contains_key(&index_3));
+        assert!(cs.witness_backtrace.contains_key(&(&index_3 + 1)));
+        assert!(cs.witness_backtrace.contains_key(&(&index_3 + 2)));
+
+        cs.insert_add_gate(index_3, index_3 + 1, index_3 + 2);
+        cs.pad();
+    }
+
+    #[test]
+    #[cfg(all(feature = "debug", nightly))]
+    #[should_panic]
+    fn test_dangling_wintness_should_panic() {
+        use crate::plonk::constraint_system::rescue::StateVar;
+        use zei_crypto::basic::rescue::RescueInstance;
+
+        let one = F::one();
+        let two = one.add(&one);
+        let three = one.add(&two);
+        let four = one.add(&three);
+
+        let mut cs = TurboCS::new();
+        let var_0 = cs.new_variable(one);
+        let var_1 = cs.new_variable(two);
+        let var_2 = cs.new_variable(three);
+        let var_3 = cs.new_variable(four);
+
+        let hash = RescueInstance::new();
+        let comm = hash.rescue(&[one, two, three, four])[0];
+        let comm_var = cs.new_variable(comm);
+        cs.prepare_pi_variable(comm_var);
+        let _h_var = cs.rescue_hash(&StateVar::new([var_0, var_1, var_2, var_3]))[0];
+        //cs.equal(comm_var, h_var)
+        cs.pad()
     }
 }
