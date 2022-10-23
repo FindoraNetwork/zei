@@ -290,7 +290,8 @@ mod test {
         let keypair = Keypair::generate(&mut prng);
         let (from_pk_key, encoded_rand) =
             symmetric_key_from_ed25519_public_key(&mut prng, &keypair.public);
-        let from_sk_key = symmetric_key_from_ed25519_secret_key(&keypair.secret, &encoded_rand);
+        let from_sk_key =
+            symmetric_key_from_ed25519_secret_key(&keypair.secret_key(), &encoded_rand);
         assert_eq!(from_pk_key, from_sk_key);
     }
 
@@ -314,7 +315,7 @@ mod test {
         let msg = b"this is another message";
 
         let cipherbox = hybrid_encrypt_ed25519(&mut prng, &key_pair.public, msg);
-        let plaintext = hybrid_decrypt_with_ed25519_secret_key(&cipherbox, &key_pair.secret);
+        let plaintext = hybrid_decrypt_with_ed25519_secret_key(&cipherbox, &key_pair.secret_key());
         assert_eq!(msg, plaintext.as_slice());
     }
 }

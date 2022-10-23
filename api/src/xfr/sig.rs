@@ -3,7 +3,7 @@ use ark_serialize::{Flags, SWFlags};
 use digest::consts::U64;
 use ed25519_dalek::{
     ExpandedSecretKey, PublicKey as Ed25519PublicKey, SecretKey as Ed25519SecretKey,
-    Signature as Ed25519Signature, Verifier,
+    Signature as Ed25519Signature, Signer, Verifier,
 };
 use libsecp256k1::{
     curve::{Affine as LibSecp256k1G1, FieldStorage, Scalar as LibSecp256k1Scalar},
@@ -377,9 +377,10 @@ impl XfrSecretKey {
     pub fn sign(&self, message: &[u8]) -> Result<XfrSignature> {
         match self {
             XfrSecretKey::Ed25519(sk) => {
-                let pk: Ed25519PublicKey = sk.into();
-                let expanded: ExpandedSecretKey = sk.into();
-                let sign = expanded.sign(message, &pk);
+                let sign = ed25519_dalek::Keypair::from(
+                    Ed25519SecretKey::from_bytes(&sk.to_bytes()).unwrap(),
+                )
+                .sign(message);
                 Ok(XfrSignature::Ed25519(sign))
             }
             XfrSecretKey::Secp256k1(sk) => {
@@ -502,7 +503,7 @@ impl XfrKeyPair {
         let kp = ed25519_dalek::Keypair::generate(prng);
         XfrKeyPair {
             pub_key: XfrPublicKey(XfrPublicKeyInner::Ed25519(kp.public)),
-            sec_key: XfrSecretKey::Ed25519(kp.secret),
+            sec_key: XfrSecretKey::Ed25519(kp.secret_key()),
         }
     }
 
