@@ -11,7 +11,7 @@ crate-type = ["rlib"]
 
 [dependencies]
 base64 = "0.10"
-bulletproofs = { package = "bulletproofs", git = "https://github.com/FindoraNetwork/bp", branch = "batch_verification", features = ["yoloproofs"] }
+bulletproofs = { package = "bulletproofs", git = "https://github.com/FindoraNetwork/bp", rev = "57633a", features = ["yoloproofs"] }
 curve25519-dalek = { version =  "3.0.0", features = ["serde"] }
 x25519-dalek = "1.1"
 serde = "1.0"
