@@ -13,7 +13,7 @@ crate-type = ["rlib"]
 aes = { version = "0.7.5", features = ["ctr"]}
 algebra = { path = "../algebra" }
 num-bigint = { version = "0.3.0", features = ["rand"] }
-bulletproofs = { package = "bulletproofs", git = "https://github.com/FindoraNetwork/bp", branch = "batch_verification", features = ["yoloproofs"] }
+bulletproofs = { package = "bulletproofs", git = "https://github.com/FindoraNetwork/bp", features = ["yoloproofs"] }
 curve25519-dalek = { version =  "3.0.0", features = ["serde"] }
 digest = "0.9"
 ed25519-dalek = "1.0.0"
