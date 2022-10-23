@@ -16,7 +16,7 @@ crate-type = ["rlib"]
 [dependencies]
 algebra = { path = "../algebra" }
 boolinator = "2.4.0"
-bulletproofs = { package = "bulletproofs", git = "https://github.com/FindoraNetwork/bp", branch = "batch_verification", features = ["yoloproofs"] }
+bulletproofs = { package = "bulletproofs", git = "https://github.com/FindoraNetwork/bp", features = ["yoloproofs"] }
 crypto = { path = "../crypto" }
 curve25519-dalek = { version =  "3.0.0", features = ["serde"] }
 digest = "0.9"
