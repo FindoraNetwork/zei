@@ -14,7 +14,6 @@ use algebra::bls12_381::BLSG1;
 use algebra::groups::{Group, Scalar as ZeiScalar};
 use algebra::ristretto::{
     CompressedEdwardsY, CompressedRistretto, RistrettoPoint, RistrettoScalar as Scalar,
-    RistrettoScalar,
 };
 use bulletproofs::RangeProof;
 use crypto::basics::commitments::ristretto_pedersen::RistrettoPedersenGens;

@@ -536,7 +536,7 @@ pub fn open_blind_asset_record(
                     &pc_gens,
                     amount,
                     &amount_blinds.0,
-                    amount_blinds.1,
+                    &amount_blinds.1,
                 )
             {
                 return Err(eg!(ZeiError::ParameterError));
@@ -588,7 +588,7 @@ pub fn open_blind_asset_record(
                     &pc_gens,
                     amount,
                     &amount_blinds.0,
-                    amount_blinds.1,
+                    &amount_blinds.1,
                 )
             {
                 return Err(eg!(ZeiError::ParameterError));
