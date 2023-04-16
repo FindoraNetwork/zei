@@ -529,6 +529,19 @@ pub fn open_blind_asset_record(
             let owner_memo = owner_memo.as_ref().c(d!(ZeiError::ParameterError))?;
             let amount = owner_memo.decrypt_amount(&keypair).c(d!())?;
             let amount_blinds = owner_memo.derive_amount_blinds(&keypair).c(d!())?;
+
+            let pc_gens = RistrettoPedersenGens::default();
+            if input.amount
+                != XfrAmount::from_blinds(
+                    &pc_gens,
+                    amount,
+                    &amount_blinds.0,
+                    &amount_blinds.1,
+                )
+            {
+                return Err(eg!(ZeiError::ParameterError));
+            }
+
             (
                 amount,
                 input
@@ -545,6 +558,14 @@ pub fn open_blind_asset_record(
             let asset_type = owner_memo.decrypt_asset_type(&keypair).c(d!())?;
             let asset_type_blind =
                 owner_memo.derive_asset_type_blind(&keypair).c(d!())?;
+
+            let pc_gens = RistrettoPedersenGens::default();
+            if input.asset_type
+                != XfrAssetType::from_blind(&pc_gens, &asset_type, &asset_type_blind)
+            {
+                return Err(eg!(ZeiError::ParameterError));
+            }
+
             (
                 input.amount.get_amount().c(d!(ZeiError::ParameterError))?,
                 asset_type,
@@ -561,10 +582,27 @@ pub fn open_blind_asset_record(
             let asset_type_blind =
                 owner_memo.derive_asset_type_blind(&keypair).c(d!())?;
 
+            let pc_gens = RistrettoPedersenGens::default();
+            if input.amount
+                != XfrAmount::from_blinds(
+                    &pc_gens,
+                    amount,
+                    &amount_blinds.0,
+                    &amount_blinds.1,
+                )
+            {
+                return Err(eg!(ZeiError::ParameterError));
+            }
+            if input.asset_type
+                != XfrAssetType::from_blind(&pc_gens, &asset_type, &asset_type_blind)
+            {
+                return Err(eg!(ZeiError::ParameterError));
+            }
+
             (amount, asset_type, amount_blinds, asset_type_blind)
         }
     };
-    // TODO check correctness of BlindAssetRecord
+
     Ok(OpenAssetRecord {
         blind_asset_record: input.clone(),
         amount,
