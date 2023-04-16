@@ -406,7 +406,7 @@ fn sample_blind_asset_record<R: CryptoRng + RngCore>(
                         &pc_gens,
                         asset_record.amount,
                         &amount_blinds.0,
-                        amount_blinds.1,
+                        &amount_blinds.1,
                     ),
                     XfrAssetType::from_blind(
                         &pc_gens,

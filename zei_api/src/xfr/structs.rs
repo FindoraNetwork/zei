@@ -212,7 +212,7 @@ impl XfrAmount {
         pc_gens: &RistrettoPedersenGens,
         amount: u64,
         blind_lo: &Scalar,
-        blind_hi: RistrettoScalar,
+        blind_hi: &Scalar,
     ) -> Self {
         let (amount_lo, amount_hi) = utils::u64_to_u32_pair(amount);
         let comm_lo = pc_gens
@@ -415,7 +415,7 @@ impl OwnerMemo {
     /// PRNG should be seeded with good entropy instead of being deterministically seeded
     pub fn from_amount<R: CryptoRng + RngCore>(
         prng: &mut R,
-        mut amount: u64,
+        amount: u64,
         pub_key: &XfrPublicKey,
     ) -> Result<(Self, (Scalar, Scalar))> {
         let (r, blind_share) = Scalar::random_scalar_with_compressed_edwards(prng);
